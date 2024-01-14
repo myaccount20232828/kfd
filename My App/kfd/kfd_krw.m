@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#include "KernelRwWrapper.h"
+#include "kfd_krkw.h"
 #import "libkfd.h"
 
 static uint64_t _kfd = 0;
