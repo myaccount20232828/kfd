@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var kfd: UInt64 = 0
-    @State var LogItems: [String.SubSequence] = [IsSupported() ? "Ready!" : "Unsupported", "iOS: \(GetiOSBuildID())"]
+    @State var LogItems: [String.SubSequence] = ["Ready!"]
     var body: some View {
         VStack {
             ScrollView {
@@ -41,7 +41,7 @@ struct ContentView: View {
                 Text(kfd == 0 ? "Exploit" : "Post Exploit")
                 .font(.system(size: 20))
             }
-            .disabled(!IsSupported())
+            //.disabled(!IsSupported())
             .buttonStyle(.plain)
             .frame(width: UIScreen.main.bounds.width - 80, height: 70)
             .background(Color(UIColor.systemGray6))
