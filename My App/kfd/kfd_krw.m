@@ -61,7 +61,7 @@ uint64_t do_kopen(uint64_t puaf_pages, uint64_t puaf_method, uint64_t kread_meth
     set_selfproc();
     set_selftask();
     set_kslide();
-    our_proc_kAddr = get_selfproc();
+    //our_proc_kAddr = get_selfproc();
     //usleep(10000);
     //initKernRw(get_selftask(), kread64, kwrite64);
     //printf("isKernRwReady: %d\n", isKernRwReady());
