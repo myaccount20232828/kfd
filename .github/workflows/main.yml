@@ -11,7 +11,7 @@ jobs:
             git config user.name github-actions
             git config user.email github-actions@github.com
             git clone https://github.com/AppInstalleriOSGH/Taurine
-            cp -r Taurine/Taurine/exploit/kfd kfd
-            git add kfd
+            cp -r Taurine/Taurine/exploit/kfd "My App/kfd"
+            git add "My App/kfd"
             git commit -m "Added exploit"
             git push
