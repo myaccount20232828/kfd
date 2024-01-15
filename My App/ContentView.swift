@@ -6,14 +6,9 @@ struct ContentView: View {
         VStack {
             ScrollView {
                 ScrollViewReader { scroll in
-                    VStack(alignment: .leading) {
-                        ForEach(GetLogString().split(separator: "\n"), id: \.self) { LogItem in
-                            Text("[*] \(String(LogItem))")
-                            //.textSelection(.enabled)
-                            .font(.custom("Menlo", size: 15))
-                        }
-                    }
-                    .onChange(of: GetLogString()) { obj in
+                    Text(GetLogString())
+                    .font(.custom("Menlo", size: 15))
+                    .onChange(of: LogString) { obj in
                         DispatchQueue.global(qos: .utility).async {
                             //scroll.scrollTo(LogItems.count - 1)
                             UIPasteboard.general.string = "Refresh"
@@ -33,10 +28,10 @@ struct ContentView: View {
                     postExploit()
                     kclose(kfd)
                     kfd = 0
-                    //UIPasteboard.general.string = GetLogString()
+                    UIPasteboard.general.string = GetLogString()
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 2" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 3" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
