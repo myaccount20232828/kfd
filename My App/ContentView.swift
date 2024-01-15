@@ -34,7 +34,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 19" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 20" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -115,11 +115,7 @@ class LogStream {
             write(origErr, buffer, bytesRead)
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
-            let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-            //let textColor = UIColor(red: 219/255.0, green: 44.0/255.0, blue: 56.0/255.0, alpha: 1)
-            let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
-            self.outputString.append(str)
-            LogItems.wrappedValue = self.outputString.split(separator: "\n")
+            LogItems.wrappedValue.append(String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self)))
         }
     }
 }
