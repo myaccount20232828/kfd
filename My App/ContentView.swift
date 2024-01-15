@@ -22,13 +22,18 @@ struct ContentView: View {
                     UIPasteboard.general.string = GetLogString()
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 5" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 6" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
             .frame(width: UIScreen.main.bounds.width - 80, height: 70)
             .background(Color(UIColor.systemGray6))
             .cornerRadius(20)
+            Button {
+                testPrint()
+            } label: {
+                Text("Test")
+            }
         }
     }
 }
