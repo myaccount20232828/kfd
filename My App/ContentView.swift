@@ -32,12 +32,13 @@ struct ContentView: View {
                 if kfd == 0 {
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
                 } else {
+                    enableLog(true)
                     postExploit()
                     kclose(kfd)
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 11" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 12" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
