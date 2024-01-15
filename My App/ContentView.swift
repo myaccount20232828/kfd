@@ -2,14 +2,14 @@ import SwiftUI
 
 struct ContentView: View {
     @State var kfd: UInt64 = 0
-    @State var LogItems: [String] = ["Ready!"]
+    @State var LogItems: [String.SubSequence] = ["Ready!"]
     var body: some View {
         VStack {
             ScrollView {
                 ScrollViewReader { scroll in
                     VStack(alignment: .leading) {
                         ForEach(LogItems, id: \.self) { LogItem in
-                            Text("[*] \(LogItem)")
+                            Text("[*] \(String(LogItem))")
                             .font(.custom("Menlo", size: 15))
                         }
                     }
@@ -68,7 +68,7 @@ class LogStream {
     private let readQueue: DispatchQueue
     private let outputSource: DispatchSourceRead
     private let errorSource: DispatchSourceRead
-    init(_ LogItems: Binding<[String]>) {
+    init(_ LogItems: Binding<[String.SubSequence]>) {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
         pipe(&outputFd)
         pipe(&errFd)
