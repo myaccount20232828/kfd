@@ -2,14 +2,14 @@ import SwiftUI
 
 struct ContentView: View {
     @State var kfd: UInt64 = 0
-    @State var LogItems: [String.SubSequence] = ["Ready!"]
+    @State var LogItems: [String] = ["Ready!"]
     var body: some View {
         VStack {
             ScrollView {
                 ScrollViewReader { scroll in
                     VStack(alignment: .leading) {
                         ForEach(0..<LogItems.count, id: \.self) { LogItem in
-                            Text("[*] \(String(LogItems[LogItem]))")
+                            Text("[*] \(LogItems[LogItem])")
                             .font(.custom("Menlo", size: 15))
                         }
                     }
@@ -67,7 +67,7 @@ class LogStream {
     private let readQueue: DispatchQueue
     private let outputSource: DispatchSourceRead
     private let errorSource: DispatchSourceRead
-    init(_ LogItems: Binding<[String.SubSequence]>) {
+    init(_ LogItems: Binding<[String]>) {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
         guard pipe(&outputFd) != -1,
             pipe(&errFd) != -1 else {
@@ -99,7 +99,7 @@ class LogStream {
         outputSource.resume()
         errorSource.resume()
     }
-    func logItem(_ buffer: UnsafeMutablePointer<UInt8>, _ LogItems: Binding<[String.SubSequence]>, _ isError: Bool) {
+    func logItem(_ buffer: UnsafeMutablePointer<UInt8>, _ LogItems: Binding<[String]>, _ isError: Bool) {
         defer { buffer.deallocate() }
             let bytesRead = read(isError ? self.errFd[0] : self.outputFd[0], buffer, Int(BUFSIZ))
             guard bytesRead > 0 else {
