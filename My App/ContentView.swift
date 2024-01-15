@@ -14,9 +14,9 @@ struct ContentView: View {
                             .font(.custom("Menlo", size: 15))
                         }
                     }
-                    .onChange(of: LogItems) { _ in
+                    .onChange(of: Log.LogItems) { _ in
                         DispatchQueue.global(qos: .utility).async {
-                            scroll.scrollTo(LogItems.count - 1)
+                            scroll.scrollTo(Log.LogItems.count - 1)
                         }
                     }
                 }
