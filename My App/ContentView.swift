@@ -1,160 +1,84 @@
+/*
+ * Copyright (c) 2023 Félix Poulin-Bélanger. All rights reserved.
+ */
+
 import SwiftUI
 
 struct ContentView: View {
-    @State var kfd: UInt64 = 0
-    @State var LogItems: [String.SubSequence] = ["Ready!"]
+    @State private var kfd: UInt64 = 0
 
-    @State var ShouldFtechLog = true
+    private var puaf_pages_options = [16, 32, 64, 128, 256, 512, 1024, 2048]
+    @State private var puaf_pages_index = 7
+    @State private var puaf_pages = 0
+
+    private var puaf_method_options = ["physpuppet", "smith", "landa"]
+    @State private var puaf_method = 2
+
+    private var kread_method_options = ["kqueue_workloop_ctl", "sem_open", "IOSurface"]
+    @State private var kread_method = 1
+
+    private var kwrite_method_options = ["dup", "sem_open", "IOSurface"]
+    @State private var kwrite_method = 1
+
     var body: some View {
-        VStack {
-            ScrollView {
-                ScrollViewReader { scroll in
-                    VStack(alignment: .leading) {
-                        ForEach(0..<LogItems.count, id: \.self) { LogItem in
-                            Text("[*] \(String(LogItems[LogItem]))")
-                            //.textSelection(.enabled)
-                            .font(.custom("Menlo", size: 15))
+        NavigationView {
+            Form {
+                Section {
+                    Picker(selection: $puaf_pages_index, label: Text("puaf pages:")) {
+                        ForEach(0 ..< puaf_pages_options.count, id: \.self) {
+                            Text(String(self.puaf_pages_options[$0]))
                         }
-                    }
-                    .onReceive(NotificationCenter.default.publisher(for: LogStream.shared.reloadNotification)) { obj in
-                        if ShouldFtechLog {          
-                            DispatchQueue.global(qos: .utility).async {
-                                FetchLog()
-                                scroll.scrollTo(LogItems.count - 1)
-                            }
+                    }.disabled(kfd != 0)
+                }
+                Section {
+                    Picker(selection: $puaf_method, label: Text("puaf method:")) {
+                        ForEach(0 ..< puaf_method_options.count, id: \.self) {
+                            Text(self.puaf_method_options[$0])
                         }
-                    }
+                    }.disabled(kfd != 0)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .padding()
-            .frame(width: UIScreen.main.bounds.width - 80, height: 300)
-            .background(Color(UIColor.systemGray6))
-            .cornerRadius(20)          
-            Button {
-                DispatchQueue.global(qos: .utility).async {
-                    if kfd == 0 {
-                        ShouldFtechLog = false
-                        LogStream.shared.pause()
-                        kfd = kopen(0x800, 0x0, 0x2, 0x2)
-                        ShouldFtechLog = true
-                        LogStream.shared.resume()
-                        print("Done")
-                    } else {
-                        print("a")
-                        kclose(kfd)
-                    }
+                Section {
+                    Picker(selection: $kread_method, label: Text("kread method:")) {
+                        ForEach(0 ..< kread_method_options.count, id: \.self) {
+                            Text(self.kread_method_options[$0])
+                        }
+                    }.disabled(kfd != 0)
                 }
-            } label: {
-                Text(kfd == 0 ? "Exploit 3" : "Post Exploit")
-                .font(.system(size: 20))
-            }
-            //.disabled(!IsSupported())
-            .buttonStyle(.plain)
-            .frame(width: UIScreen.main.bounds.width - 80, height: 70)
-            .background(Color(UIColor.systemGray6))
-            .cornerRadius(20)
+                Section {
+                    Picker(selection: $kwrite_method, label: Text("kwrite method:")) {
+                        ForEach(0 ..< kwrite_method_options.count, id: \.self) {
+                            Text(self.kwrite_method_options[$0])
+                        }
+                    }.disabled(kfd != 0)
+                }
+                Section {
+                    HStack {
+                        Button("kopen") {
+                            puaf_pages = puaf_pages_options[puaf_pages_index]
+                            kfd = kopen_intermediate(UInt64(puaf_pages), UInt64(puaf_method), UInt64(kread_method), UInt64(kwrite_method))
+                        }.disabled(kfd != 0).frame(minWidth: 0, maxWidth: .infinity)
+                        Button("kclose") {
+                            kclose_intermediate(kfd)
+                            puaf_pages = 0
+                            kfd = 0
+                        }.disabled(kfd == 0).frame(minWidth: 0, maxWidth: .infinity)
+                    }
+                }.listRowBackground(Color.clear)
+                if kfd != 0 {
+                    Section {
+                        VStack {
+                            Text("Success!").foregroundColor(.green)
+                            Text("Look at output in Xcode")
+                        }.frame(minWidth: 0, maxWidth: .infinity)
+                    }.listRowBackground(Color.clear)
+                }
+            }.navigationBarTitle(Text("kfd"), displayMode: .inline)
         }
-    }
-    func FetchLog() {
-        guard let AttributedText = LogStream.shared.outputString.copy() as? NSAttributedString else {
-            LogItems = ["Error Getting Log!"]
-            return
-        }
-        LogItems = AttributedText.string.split(separator: "\n")
     }
 }
 
-//From https://github.com/Odyssey-Team/Taurine/blob/main/Taurine/app/LogStream.swift
-//Code from Taurine https://github.com/Odyssey-Team/Taurine under BSD 4 License
-class LogStream {
-    static let shared = LogStream()
-    private(set) var outputString: NSMutableAttributedString = NSMutableAttributedString()
-    public let reloadNotification = Notification.Name("LogStreamReloadNotification")
-    private(set) var outputFd: [Int32] = [0, 0]
-    private(set) var errFd: [Int32] = [0, 0]
-    private let readQueue: DispatchQueue
-    private let outputSource: DispatchSourceRead
-    private let errorSource: DispatchSourceRead
-    init() {
-        readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
-        guard pipe(&outputFd) != -1,
-            pipe(&errFd) != -1 else {
-                fatalError("pipe failed")
-        }
-        let origOutput = dup(STDOUT_FILENO)
-        let origErr = dup(STDERR_FILENO)
-        setvbuf(stdout, nil, _IONBF, 0)
-        guard dup2(outputFd[1], STDOUT_FILENO) >= 0,
-            dup2(errFd[1], STDERR_FILENO) >= 0 else {
-                fatalError("dup2 failed")
-        }
-        outputSource = DispatchSource.makeReadSource(fileDescriptor: outputFd[0], queue: readQueue)
-        errorSource = DispatchSource.makeReadSource(fileDescriptor: errFd[0], queue: readQueue)
-        outputSource.setCancelHandler {
-            close(self.outputFd[0])
-            close(self.outputFd[1])
-        }
-        errorSource.setCancelHandler {
-            close(self.errFd[0])
-            close(self.errFd[1])
-        }
-        let bufsiz = Int(BUFSIZ)
-        outputSource.setEventHandler {
-            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufsiz)
-            defer { buffer.deallocate() }
-            let bytesRead = read(self.outputFd[0], buffer, bufsiz)
-            guard bytesRead > 0 else {
-                if bytesRead == -1 && errno == EAGAIN {
-                    return
-                }
-                self.outputSource.cancel()
-                return
-            }
-            write(origOutput, buffer, bytesRead)
-            let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
-            array.withUnsafeBufferPointer { ptr in
-                let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-                let textColor = UIColor.white
-                let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
-                self.outputString.append(substring)
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: self.reloadNotification, object: nil)
-                }
-            }
-        }
-        errorSource.setEventHandler {
-            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufsiz)
-            defer { buffer.deallocate() }
-            let bytesRead = read(self.errFd[0], buffer, bufsiz)
-            guard bytesRead > 0 else {
-                if bytesRead == -1 && errno == EAGAIN {
-                    return
-                }
-                self.errorSource.cancel()
-                return
-            }
-            write(origErr, buffer, bytesRead)
-            let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
-            array.withUnsafeBufferPointer { ptr in
-                let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-                let textColor = UIColor(red: 219/255.0, green: 44.0/255.0, blue: 56.0/255.0, alpha: 1)
-                let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
-                self.outputString.append(substring)
-                DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: self.reloadNotification, object: nil)
-                }
-            }
-        }
-        outputSource.resume()
-        errorSource.resume()
-    }
-    func pause(){
-        outputSource.suspend()
-        errorSource.suspend()
-    }
-    func resume(){
-        outputSource.resume()
-        errorSource.resume()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
     }
 }
