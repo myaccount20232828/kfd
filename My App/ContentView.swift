@@ -130,7 +130,9 @@ class LogStream {
                 let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
                 self.outputString.append(substring)
                 DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: self.reloadNotification, object: nil)
+                    if logEnabled {
+                        NotificationCenter.default.post(name: self.reloadNotification, object: nil)
+                    }
                 }
             }
         }
@@ -153,7 +155,9 @@ class LogStream {
                 let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
                 self.outputString.append(substring)
                 DispatchQueue.main.async {
-                    NotificationCenter.default.post(name: self.reloadNotification, object: nil)
+                    if logEnabled {
+                        NotificationCenter.default.post(name: self.reloadNotification, object: nil)
+                    }
                 }
             }
         }
