@@ -10,6 +10,4 @@ void kwrite32(uint64_t where, uint32_t what);
 void kwrite64(uint64_t where, uint64_t what);
 uint64_t getProc(pid_t pid);
 void kfd_print(char* format, ...);
-NSString* LogString = @"";
-NSString* GetLogString(void);
 void testPrint(void);
