@@ -15,7 +15,11 @@ struct ContentView: View {
                     }
                     .onReceive(NotificationCenter.default.publisher(for: Notification.Name("com.AppInstalleriOS.LogStream"))) { obj in
                         DispatchQueue.global(qos: .utility).async {
-                            UIPasteboard.general.string = obj.userInfo?.description
+                            if let a = obj.userInfo {
+                                UIPasteboard.general.string = a.description
+                            } else {
+                                UIPasteboard.general.string = "it is nil"
+                            }
                             LogItems = GetLogString().split(separator: "\n")
                             scroll.scrollTo(LogItems.count - 1)
                         }
@@ -36,7 +40,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 9" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 10" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
