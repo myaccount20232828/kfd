@@ -3,24 +3,21 @@ import SwiftUI
 struct ContentView: View {
     @State var kfd: UInt64 = 0
     @State var LogItems: [String.SubSequence] = ["Ready!"]
-    @State var ShowLog = true
     var body: some View {
         VStack {
             ScrollView {
                 ScrollViewReader { scroll in
-                    if ShowLog {
-                        VStack(alignment: .leading) {
-                            ForEach(0..<LogItems.count, id: \.self) { LogItem in
-                                Text("[*] \(String(LogItems[LogItem]))")
-                                //.textSelection(.enabled)
-                                .font(.custom("Menlo", size: 15))
-                            }
+                    VStack(alignment: .leading) {
+                        ForEach(0..<LogItems.count, id: \.self) { LogItem in
+                            Text("[*] \(String(LogItems[LogItem]))")
+                            //.textSelection(.enabled)
+                            .font(.custom("Menlo", size: 15))
                         }
-                        .onReceive(NotificationCenter.default.publisher(for: LogStream.shared.reloadNotification)) { obj in
-                            DispatchQueue.global(qos: .utility).async {
-                                FetchLog()
-                                scroll.scrollTo(LogItems.count - 1)
-                            }
+                    }
+                    .onReceive(NotificationCenter.default.publisher(for: LogStream.shared.reloadNotification)) { obj in
+                        DispatchQueue.global(qos: .utility).async {
+                            FetchLog()
+                            scroll.scrollTo(LogItems.count - 1)
                         }
                     }
                 }
@@ -32,19 +29,16 @@ struct ContentView: View {
             .cornerRadius(20)          
             Button {
                 if kfd == 0 {
-                    ShowLog = false
                     LogStream.shared.pause()
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
                     LogStream.shared.resume()
-                    ShowLog = true
-                    print("Done")
                 } else {
                     print("a")
                     kclose(kfd)
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit 6" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit 7: Log Stuff" : "Post Exploit")
                 .font(.system(size: 20))
             }
             //.disabled(!IsSupported())
@@ -55,13 +49,11 @@ struct ContentView: View {
         }
     }
     func FetchLog() {
-        if ShowLog {
-            guard let AttributedText = LogStream.shared.outputString.copy() as? NSAttributedString else {
-                LogItems = ["Error Getting Log!"]
-                return
-            }
-            LogItems = AttributedText.string.split(separator: "\n")
+        guard let AttributedText = LogStream.shared.outputString.copy() as? NSAttributedString else {
+            LogItems = ["Error Getting Log!"]
+            return
         }
+        LogItems = AttributedText.string.split(separator: "\n")
     }
 }
 
