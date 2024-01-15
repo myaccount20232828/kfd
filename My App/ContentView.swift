@@ -2,7 +2,6 @@ import SwiftUI
 
 struct ContentView: View {
     @State var kfd: UInt64 = 0
-    @State var test = "nothing"
     @State var LogItems: [String.SubSequence] = ["Ready!"]
     var body: some View {
         VStack {
@@ -16,7 +15,7 @@ struct ContentView: View {
                     }
                     .onReceive(NotificationCenter.default.publisher(for: Notification.Name("com.AppInstalleriOS.LogStream"))) { obj in
                         DispatchQueue.global(qos: .utility).async {
-                            test = "\(test)\nchanged"
+                            UIPasteboarf.general.string = obj.description
                             LogItems = GetLogString().split(separator: "\n")
                             scroll.scrollTo(LogItems.count - 1)
                         }
@@ -28,7 +27,6 @@ struct ContentView: View {
             .frame(width: UIScreen.main.bounds.width - 80, height: 300)
             .background(Color(UIColor.systemGray6))
             .cornerRadius(20)
-            Text(test)
             Button {
                 if kfd == 0 {
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
