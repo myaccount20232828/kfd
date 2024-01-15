@@ -18,7 +18,6 @@
 #include <sys/syscall.h>
 #include <sys/sysctl.h>
 #include <unistd.h>
-#include "../Utilities.h"
 
 #define pages(number_of_pages) ((number_of_pages) * (ARM_PGBYTES))
 
@@ -43,7 +42,7 @@ typedef uintptr_t usize;
 
 #if CONFIG_PRINT
 
-#define print(args...) kfd_print(args)
+#define print(args...) printf(args)
 
 #else /* CONFIG_PRINT */
 
