@@ -72,14 +72,14 @@ class LogStream {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
         guard pipe(&outputFd) != -1,
             pipe(&errFd) != -1 else {
-                fatalError("pipe failed")
+                print("pipe failed")
         }
         let origOutput = dup(STDOUT_FILENO)
         let origErr = dup(STDERR_FILENO)
         setvbuf(stdout, nil, _IONBF, 0)
         guard dup2(outputFd[1], STDOUT_FILENO) >= 0,
             dup2(errFd[1], STDERR_FILENO) >= 0 else {
-                fatalError("dup2 failed")
+                print("dup2 failed")
         }
         outputSource = DispatchSource.makeReadSource(fileDescriptor: outputFd[0], queue: readQueue)
         errorSource = DispatchSource.makeReadSource(fileDescriptor: errFd[0], queue: readQueue)
@@ -107,7 +107,6 @@ class LogStream {
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-                let textColor = UIColor.white
                 self.outputString.append(str)
                 LogItems.wrappedValue = self.outputString.split(separator: "\n")
             }
@@ -127,8 +126,6 @@ class LogStream {
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-                let textColor = UIColor(red: 219/255.0, green: 44.0/255.0, blue: 56.0/255.0, alpha: 1)
-                let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
                 self.outputString.append(str)
                 LogItems.wrappedValue = self.outputString.split(separator: "\n")
             }
