@@ -28,7 +28,7 @@ uint64_t off_u_cr_svgid = 0x6c;
 void postExploit(void) {
     uint64_t proc = getProc(getpid());
     if (proc == -1) {
-        printf("Failed to get proc for PID %d\n", pid);
+        printf("Failed to get proc\n");
         return;
     }
     printf("proc: 0x%llx\n", proc);
@@ -64,7 +64,7 @@ uint64_t getProc(pid_t pid) {
             return -1;
         }
     }
-    return 0;
+    return -1;
 }
 
 uint32_t kread32(uint64_t where) {
