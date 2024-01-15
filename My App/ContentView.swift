@@ -90,11 +90,11 @@ class LogStream {
         }
         outputSource.setEventHandler {
             let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BUFSIZ))
-            logItem(buffer, LogItems)
+            logItem(buffer, LogItems, false)
         }
         errorSource.setEventHandler {
             let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BUFSIZ))
-            logItem(buffer, LogItems)
+            logItem(buffer, LogItems, true)
         }
         outputSource.resume()
         errorSource.resume()
