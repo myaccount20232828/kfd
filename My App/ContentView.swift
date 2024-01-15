@@ -36,9 +36,10 @@ struct ContentView: View {
                     postExploit()
                     kclose(kfd)
                     kfd = 0
+                    enableLog(false)
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 12" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 13" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
