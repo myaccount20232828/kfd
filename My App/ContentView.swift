@@ -7,17 +7,19 @@ struct ContentView: View {
         VStack {
             ScrollView {
                 ScrollViewReader { scroll in
-                    VStack(alignment: .leading) {
-                        ForEach(0..<LogItems.count, id: \.self) { LogItem in
-                            Text("[*] \(String(LogItems[LogItem]))")
-                            //.textSelection(.enabled)
-                            .font(.custom("Menlo", size: 15))
+                    if kfd != 0 {
+                        VStack(alignment: .leading) {
+                            ForEach(0..<LogItems.count, id: \.self) { LogItem in
+                                Text("[*] \(String(LogItems[LogItem]))")
+                                //.textSelection(.enabled)
+                                .font(.custom("Menlo", size: 15))
+                            }
                         }
-                    }
-                    .onReceive(NotificationCenter.default.publisher(for: LogStream.shared.reloadNotification)) { obj in
-                        DispatchQueue.global(qos: .utility).async {
-                            FetchLog()
-                            scroll.scrollTo(LogItems.count - 1)
+                        .onReceive(NotificationCenter.default.publisher(for: LogStream.shared.reloadNotification)) { obj in
+                            DispatchQueue.global(qos: .utility).async {
+                                FetchLog()
+                                scroll.scrollTo(LogItems.count - 1)
+                            }
                         }
                     }
                 }
@@ -29,16 +31,16 @@ struct ContentView: View {
             .cornerRadius(20)          
             Button {
                 if kfd == 0 {
-                    LogStream.shared.pause()
+                    //LogStream.shared.pause()
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
-                    LogStream.shared.resume()
+                    //LogStream.shared.resume()
                 } else {
                     print("a")
                     kclose(kfd)
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit 7: Log Stuff" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit 8: Log Stuff" : "Post Exploit")
                 .font(.system(size: 20))
             }
             //.disabled(!IsSupported())
