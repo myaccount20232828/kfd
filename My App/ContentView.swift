@@ -36,6 +36,7 @@ struct ContentView: View {
                     testSleep()
                     enableLog(true)
                 } else {
+                    postExploit()
                     enableLog(false)
                     testSleep()
                     kclose(kfd)
@@ -44,7 +45,7 @@ struct ContentView: View {
                     enableLog(true)
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 15" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 16" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -65,6 +66,6 @@ struct ContentView: View {
         }
     }
     func testSleep() {
-        sleep(1)
+        Thread.sleep(forTimeInterval: 0.5)
     }
 }
