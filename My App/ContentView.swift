@@ -8,12 +8,12 @@ struct ContentView: View {
                 ScrollViewReader { scroll in
                     Text(GetLogString())
                     .font(.custom("Menlo", size: 15))
-                    .onChange(of: LogString) { obj in
-                        DispatchQueue.global(qos: .utility).async {
+                    //.onChange(of: LogString) { obj in
+                        //DispatchQueue.global(qos: .utility).async {
                             //scroll.scrollTo(LogItems.count - 1)
-                            UIPasteboard.general.string = "Refresh"
-                        }
-                    }
+                            //UIPasteboard.general.string = "Refresh"
+                        //}
+                    //}
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
