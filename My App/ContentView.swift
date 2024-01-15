@@ -54,7 +54,7 @@ struct ContentView: View {
             .disabled(kfd == 0)
         }
         .onAppear {
-            //LogStream($LogItems)
+            LogStream($LogItems)
         }
     }
 }
