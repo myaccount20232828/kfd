@@ -2,14 +2,15 @@ import SwiftUI
 
 struct ContentView: View {
     @State var kfd: UInt64 = 0
-    @State var LogItems: [String.SubSequence] = ["Ready!"]
+    @State var LogItems: [String] = ["Ready!"]
+    @State var Log = LogStream()
     var body: some View {
         VStack {
             ScrollView {
                 ScrollViewReader { scroll in
                     VStack(alignment: .leading) {
-                        ForEach(0..<LogItems.count, id: \.self) { LogItem in
-                            Text("[*] \(String(LogItems[LogItem]))")
+                        ForEach(Log.LogItems, id: \.self) { LogItem in
+                            Text("[*] \(LogItem)")
                             .font(.custom("Menlo", size: 15))
                         }
                     }
@@ -34,7 +35,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log v2 1" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log v2 2" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -54,7 +55,7 @@ struct ContentView: View {
             .disabled(kfd == 0)
         }
         .onAppear {
-            LogStream($LogItems)
+            //LogStream($LogItems)
         }
     }
 }
@@ -62,13 +63,14 @@ struct ContentView: View {
 //From https://github.com/Odyssey-Team/Taurine/blob/main/Taurine/app/LogStream.swift
 //Code from Taurine https://github.com/Odyssey-Team/Taurine under BSD 4 License
 class LogStream {
+    var LogItems: [String] = ["Ready!"]
     private(set) var outputString = ""
     private(set) var outputFd: [Int32] = [0, 0]
     private(set) var errFd: [Int32] = [0, 0]
     private let readQueue: DispatchQueue
     private let outputSource: DispatchSourceRead
     private let errorSource: DispatchSourceRead
-    init(_ LogItems: Binding<[String.SubSequence]>) {
+    init() {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
         pipe(&outputFd)
         pipe(&errFd)
@@ -104,7 +106,7 @@ class LogStream {
             array.withUnsafeBufferPointer { ptr in
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
                 self.outputString.append(str)
-                LogItems.wrappedValue = self.outputString.split(separator: "\n")
+                self.LogItems = self.outputString.split(separator: "\n")
             }
         }
         errorSource.setEventHandler {
@@ -123,7 +125,7 @@ class LogStream {
             array.withUnsafeBufferPointer { ptr in
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
                 self.outputString.append(str)
-                LogItems.wrappedValue = self.outputString.split(separator: "\n")
+                self.LogItems = self.outputString.split(separator: "\n")
             }
         }
         outputSource.resume()
