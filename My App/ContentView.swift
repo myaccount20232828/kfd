@@ -62,14 +62,11 @@ struct ContentView: View {
 //From https://github.com/Odyssey-Team/Taurine/blob/main/Taurine/app/LogStream.swift
 //Code from Taurine https://github.com/Odyssey-Team/Taurine under BSD 4 License
 class LogStream {
-    private(set) var outputString = ""
-    public let reloadNotification = Notification.Name("LogStreamReloadNotification")
     private(set) var outputFd: [Int32] = [0, 0]
     private(set) var errFd: [Int32] = [0, 0]
     private let readQueue: DispatchQueue
     private let outputSource: DispatchSourceRead
     private let errorSource: DispatchSourceRead
-    //public var LogItems: [String.SubSequence]
     init(_ LogItems: Binding<[String.SubSequence]>) {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
         guard pipe(&outputFd) != -1,
@@ -93,30 +90,20 @@ class LogStream {
             close(self.errFd[0])
             close(self.errFd[1])
         }
-        let bufsiz = Int(BUFSIZ)
         outputSource.setEventHandler {
             let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufsiz)
-            defer { buffer.deallocate() }
-            let bytesRead = read(self.outputFd[0], buffer, bufsiz)
-            guard bytesRead > 0 else {
-                if bytesRead == -1 && errno == EAGAIN {
-                    return
-                }
-                self.outputSource.cancel()
-                return
-            }
-            write(origOutput, buffer, bytesRead)
-            let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
-            array.withUnsafeBufferPointer { ptr in
-                let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-                let textColor = UIColor.white
-                self.outputString.append(str)
-                LogItems.wrappedValue = self.outputString.split(separator: "\n")
-            }
+            logItem(buffer, LogItems)
         }
         errorSource.setEventHandler {
             let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufsiz)
-            defer { buffer.deallocate() }
+            logItem(buffer, LogItems)
+        }
+        outputSource.resume()
+        errorSource.resume()
+    }
+    func logItem(_ buffer: UnsafeMutablePointer<UInt8>, _ LogItems: Binding<[String.SubSequence]>) {
+        let bufsiz = Int(BUFSIZ)
+        defer { buffer.deallocate() }
             let bytesRead = read(self.errFd[0], buffer, bufsiz)
             guard bytesRead > 0 else {
                 if bytesRead == -1 && errno == EAGAIN {
@@ -128,14 +115,11 @@ class LogStream {
             write(origErr, buffer, bytesRead)
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
-                let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-                let textColor = UIColor(red: 219/255.0, green: 44.0/255.0, blue: 56.0/255.0, alpha: 1)
-                let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
-                self.outputString.append(str)
-                LogItems.wrappedValue = self.outputString.split(separator: "\n")
-            }
+            let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
+            //let textColor = UIColor(red: 219/255.0, green: 44.0/255.0, blue: 56.0/255.0, alpha: 1)
+            let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
+            self.outputString.append(str)
+            LogItems.wrappedValue = self.outputString.split(separator: "\n")
         }
-        outputSource.resume()
-        errorSource.resume()
     }
 }
