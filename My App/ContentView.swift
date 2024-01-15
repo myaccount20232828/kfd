@@ -73,8 +73,6 @@ class LogStream {
             pipe(&errFd) != -1 else {
                 fatalError("pipe failed")
         }
-        let origOutput = dup(STDOUT_FILENO)
-        let origErr = dup(STDERR_FILENO)
         setvbuf(stdout, nil, _IONBF, 0)
         guard dup2(outputFd[1], STDOUT_FILENO) >= 0,
             dup2(errFd[1], STDERR_FILENO) >= 0 else {
@@ -91,28 +89,31 @@ class LogStream {
             close(self.errFd[1])
         }
         outputSource.setEventHandler {
-            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufsiz)
+            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BUFSIZ))
             logItem(buffer, LogItems)
         }
         errorSource.setEventHandler {
-            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufsiz)
+            let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(BUFSIZ))
             logItem(buffer, LogItems)
         }
         outputSource.resume()
         errorSource.resume()
     }
-    func logItem(_ buffer: UnsafeMutablePointer<UInt8>, _ LogItems: Binding<[String.SubSequence]>) {
-        let bufsiz = Int(BUFSIZ)
+    func logItem(_ buffer: UnsafeMutablePointer<UInt8>, _ LogItems: Binding<[String.SubSequence]>, _ isError: Bool) {
         defer { buffer.deallocate() }
-            let bytesRead = read(self.errFd[0], buffer, bufsiz)
+            let bytesRead = read(isError ? self.errFd[0] : self.outputFd[0], buffer, Int(BUFSIZ))
             guard bytesRead > 0 else {
                 if bytesRead == -1 && errno == EAGAIN {
                     return
                 }
-                self.errorSource.cancel()
+                if isError {
+                    self.errorSource.cancel()
+                } else {
+                    self.outputSource.cancel()
+                }
                 return
             }
-            write(origErr, buffer, bytesRead)
+            write(isError ? dup(STDERR_FILENO) : dup(STDOUT_FILENO), buffer, bytesRead)
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
             LogItems.wrappedValue.append(String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self)))
