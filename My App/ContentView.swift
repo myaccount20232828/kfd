@@ -28,17 +28,19 @@ struct ContentView: View {
             .background(Color(UIColor.systemGray6))
             .cornerRadius(20)          
             Button {
-                if kfd == 0 {
-                    LogStream.shared.pause()
-                    kfd = kopen(0x800, 0x0, 0x2, 0x2)
-                    LogStream.shared.resume()
-                    print("Done")
-                } else {
-                    print("a")
-                    kclose(kfd)
+                DispatchQueue.global(qos: .utility).async {
+                    if kfd == 0 {
+                        LogStream.shared.pause()
+                        kfd = kopen(0x800, 0x0, 0x2, 0x2)
+                        LogStream.shared.resume()
+                        print("Done")
+                    } else {
+                        print("a")
+                        kclose(kfd)
+                    }
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit 2" : "Post Exploit")
                 .font(.system(size: 20))
             }
             //.disabled(!IsSupported())
