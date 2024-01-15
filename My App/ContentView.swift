@@ -3,7 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @State var kfd: UInt64 = 0
     @State var LogItems: [String.SubSequence] = ["Ready!"]
-    @State var ShowLog = false
+    @State var ShowLog = true
     var body: some View {
         VStack {
             ScrollView {
@@ -41,7 +41,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit 9: Log Stuff" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit 10: Log Stuff" : "Post Exploit")
                 .font(.system(size: 20))
             }
             //.disabled(!IsSupported())
