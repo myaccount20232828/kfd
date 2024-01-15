@@ -28,22 +28,29 @@ uint64_t off_u_cr_rgid = 0x68;
 uint64_t off_u_cr_svgid = 0x6c;
 
 NSString* LogString = @"";
+BOOL isLogEnabled = false;
+
+void enableLog(BOOL enable) {
+    isLogEnabled = enable;
+}
 
 void testPrint(void) {
     kfd_print("test print\n");
 }
 
 void kfd_print(char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    int length = vsnprintf(NULL, 0, format, args);
-    char* result = malloc(length + 1);
-    vsnprintf(result, length + 1, format, args);
-    va_end(args);
-    NSString* string = [NSString stringWithUTF8String: result];
-    if (string) {
-        LogString = [LogString stringByAppendingString: string];
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"com.AppInstalleriOS.LogStream" object: LogString];
+    if (isLogEnabled) {
+        va_list args;
+        va_start(args, format);
+        int length = vsnprintf(NULL, 0, format, args);
+        char* result = malloc(length + 1);
+        vsnprintf(result, length + 1, format, args);
+        va_end(args);
+        NSString* string = [NSString stringWithUTF8String: result];
+        if (string) {
+            LogString = [LogString stringByAppendingString: string];
+            [[NSNotificationCenter defaultCenter] postNotificationName: @"com.AppInstalleriOS.LogStream" object: LogString];
+        }
     }
 }
 
