@@ -123,7 +123,7 @@ class LogStream {
             array.withUnsafeBufferPointer { ptr in
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
                 self.outputString.append(str)
-                UIPasteboard.general.string = str
+                UIPasteboard.general.string = self.outputString
                 LogItems.wrappedValue = self.outputString.split(separator: "\n")
             }
         }
