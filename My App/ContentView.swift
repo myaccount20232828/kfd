@@ -70,7 +70,7 @@ class LogStream {
     private let outputSource: DispatchSourceRead
     private let errorSource: DispatchSourceRead
     //public var LogItems: [String.SubSequence]
-    init(_ LogItems: [String.SubSequence]) {
+    init(_ LogItems: Binding<[String.SubSequence]>) {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
         guard pipe(&outputFd) != -1,
             pipe(&errFd) != -1 else {
@@ -112,7 +112,7 @@ class LogStream {
                 let textColor = UIColor.white
                 let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
                 self.outputString.append(substring)
-                LogItems = outputString.split(separator: "\n")
+                LogItems.wrappedValue = outputString.split(separator: "\n")
             }
         }
         errorSource.setEventHandler {
@@ -133,7 +133,7 @@ class LogStream {
                 let textColor = UIColor(red: 219/255.0, green: 44.0/255.0, blue: 56.0/255.0, alpha: 1)
                 let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
                 self.outputString.append(substring)
-                LogItems = outputString.split(separator: "\n")
+                LogItems.wrappedValue = outputString.split(separator: "\n")
             }
         }
         outputSource.resume()
