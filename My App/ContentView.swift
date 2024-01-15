@@ -3,6 +3,8 @@ import SwiftUI
 struct ContentView: View {
     @State var kfd: UInt64 = 0
     @State var LogItems: [String.SubSequence] = ["Ready!"]
+
+    @State var ShouldFtechLog = true
     var body: some View {
         VStack {
             ScrollView {
@@ -15,9 +17,11 @@ struct ContentView: View {
                         }
                     }
                     .onReceive(NotificationCenter.default.publisher(for: LogStream.shared.reloadNotification)) { obj in
-                        DispatchQueue.global(qos: .utility).async {
-                            FetchLog()
-                            scroll.scrollTo(LogItems.count - 1)
+                        if ShouldFtechLog {          
+                            DispatchQueue.global(qos: .utility).async {
+                                FetchLog()
+                                scroll.scrollTo(LogItems.count - 1)
+                            }
                         }
                     }
                 }
@@ -30,8 +34,10 @@ struct ContentView: View {
             Button {
                 DispatchQueue.global(qos: .utility).async {
                     if kfd == 0 {
+                        ShouldFtechLog = false
                         LogStream.shared.pause()
                         kfd = kopen(0x800, 0x0, 0x2, 0x2)
+                        ShouldFtechLog = true
                         LogStream.shared.resume()
                         print("Done")
                     } else {
