@@ -15,7 +15,7 @@ struct ContentView: View {
                     }
                     .onReceive(NotificationCenter.default.publisher(for: Notification.Name("com.AppInstalleriOS.LogStream"))) { obj in
                         DispatchQueue.global(qos: .utility).async {
-                            UIPasteboard.general.string = obj.description
+                            UIPasteboard.general.string = obj.object.description
                             LogItems = GetLogString().split(separator: "\n")
                             scroll.scrollTo(LogItems.count - 1)
                         }
