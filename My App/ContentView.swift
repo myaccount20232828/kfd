@@ -13,7 +13,7 @@ struct ContentView: View {
                             .font(.custom("Menlo", size: 15))
                         }
                     }
-                    .onReceive(GetString()) { obj in
+                    .onReceive(GetLogString()) { obj in
                         DispatchQueue.global(qos: .utility).async {
                             //scroll.scrollTo(LogItems.count - 1)
                             UIPasteboard.general.string = "Refresh"
