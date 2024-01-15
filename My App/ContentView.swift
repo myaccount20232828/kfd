@@ -62,7 +62,7 @@ struct ContentView: View {
 //From https://github.com/Odyssey-Team/Taurine/blob/main/Taurine/app/LogStream.swift
 //Code from Taurine https://github.com/Odyssey-Team/Taurine under BSD 4 License
 class LogStream {
-    private(set) var outputString: NSMutableAttributedString = NSMutableAttributedString()
+    private(set) var outputString = ""
     public let reloadNotification = Notification.Name("LogStreamReloadNotification")
     private(set) var outputFd: [Int32] = [0, 0]
     private(set) var errFd: [Int32] = [0, 0]
@@ -110,8 +110,7 @@ class LogStream {
             array.withUnsafeBufferPointer { ptr in
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
                 let textColor = UIColor.white
-                let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
-                self.outputString.append(substring)
+                self.outputString.append(str)
                 LogItems.wrappedValue = outputString.split(separator: "\n")
             }
         }
@@ -132,7 +131,7 @@ class LogStream {
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
                 let textColor = UIColor(red: 219/255.0, green: 44.0/255.0, blue: 56.0/255.0, alpha: 1)
                 let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
-                self.outputString.append(substring)
+                self.outputString.append(str)
                 LogItems.wrappedValue = outputString.split(separator: "\n")
             }
         }
