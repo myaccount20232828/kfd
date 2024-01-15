@@ -30,12 +30,12 @@ struct ContentView: View {
             Button {
                 if kfd == 0 {
                     LogStream.shared.pause()
-                    kfd = do_kopen(0x800, 0x0, 0x2, 0x2)
+                    kfd = kopen(0x800, 0x0, 0x2, 0x2)
                     LogStream.shared.resume()
                     print("Done")
                 } else {
                     print("a")
-                    do_kclose()
+                    kclose(kfd)
                 }
             } label: {
                 Text(kfd == 0 ? "Exploit" : "Post Exploit")
