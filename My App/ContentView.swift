@@ -13,9 +13,8 @@ struct ContentView: View {
                             .font(.custom("Menlo", size: 15))
                         }
                     }
-                    .onReceive(NotificationCenter.default.publisher(for: LogStream.shared.reloadNotification)) { obj in
+                    .onChange(of: LogItems) { _ in
                         DispatchQueue.global(qos: .utility).async {
-                            FetchLog()
                             scroll.scrollTo(LogItems.count - 1)
                         }
                     }
@@ -28,22 +27,14 @@ struct ContentView: View {
             .cornerRadius(20)
             Button {
                 if kfd == 0 {
-                    LogStream.shared.enableLog(false)
-                    testSleep()
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
-                    testSleep()
-                    LogStream.shared.enableLog(true)
                 } else {
                     postExploit()
-                    LogStream.shared.enableLog(false)
-                    testSleep()
                     kclose(kfd)
                     kfd = 0
-                    testSleep()
-                    LogStream.shared.enableLog(true)
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 18" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 19" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -62,23 +53,15 @@ struct ContentView: View {
             }
             .disabled(kfd == 0)
         }
-    }
-    func testSleep() {
-        Thread.sleep(forTimeInterval: 1)
-    }
-    func FetchLog() {
-        guard let AttributedText = LogStream.shared.outputString.copy() as? NSAttributedString else {
-            LogItems = ["Error Getting Log!"]
-            return
+        .onAppear {
+            LogStream($LogItems)
         }
-        LogItems = AttributedText.string.split(separator: "\n")
     }
 }
 
 //From https://github.com/Odyssey-Team/Taurine/blob/main/Taurine/app/LogStream.swift
 //Code from Taurine https://github.com/Odyssey-Team/Taurine under BSD 4 License
 class LogStream {
-    static let shared = LogStream()
     private(set) var outputString: NSMutableAttributedString = NSMutableAttributedString()
     public let reloadNotification = Notification.Name("LogStreamReloadNotification")
     private(set) var outputFd: [Int32] = [0, 0]
@@ -86,8 +69,8 @@ class LogStream {
     private let readQueue: DispatchQueue
     private let outputSource: DispatchSourceRead
     private let errorSource: DispatchSourceRead
-    private(set) var logEnabled = false
-    init() {
+    //public var LogItems: [String.SubSequence]
+    init(_ LogItems: [String.SubSequence]) {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
         guard pipe(&outputFd) != -1,
             pipe(&errFd) != -1 else {
@@ -129,11 +112,7 @@ class LogStream {
                 let textColor = UIColor.white
                 let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
                 self.outputString.append(substring)
-                DispatchQueue.main.async {
-                    if self.logEnabled {
-                        NotificationCenter.default.post(name: self.reloadNotification, object: nil)
-                    }
-                }
+                LogItems = outputString.split(separator: "\n")
             }
         }
         errorSource.setEventHandler {
@@ -154,17 +133,10 @@ class LogStream {
                 let textColor = UIColor(red: 219/255.0, green: 44.0/255.0, blue: 56.0/255.0, alpha: 1)
                 let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
                 self.outputString.append(substring)
-                DispatchQueue.main.async {
-                    if self.logEnabled {
-                        NotificationCenter.default.post(name: self.reloadNotification, object: nil)
-                    }
-                }
+                LogItems = outputString.split(separator: "\n")
             }
         }
         outputSource.resume()
         errorSource.resume()
-    }
-    func enableLog(_ enable: Bool) {
-        logEnabled = enable
     }
 }
