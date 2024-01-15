@@ -33,9 +33,7 @@ struct ContentView: View {
             Button {
                 if kfd == 0 {
                     ShowLog = false
-                    LogStream.shared.pause()
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
-                    LogStream.shared.resume()
                     ShowLog = true
                     print("Done")
                 } else {
@@ -44,7 +42,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit 4" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit 5" : "Post Exploit")
                 .font(.system(size: 20))
             }
             //.disabled(!IsSupported())
@@ -55,11 +53,13 @@ struct ContentView: View {
         }
     }
     func FetchLog() {
-        guard let AttributedText = LogStream.shared.outputString.copy() as? NSAttributedString else {
-           LogItems = ["Error Getting Log!"]
-            return
+        if ShowLog {
+            guard let AttributedText = LogStream.shared.outputString.copy() as? NSAttributedString else {
+                LogItems = ["Error Getting Log!"]
+                return
+            }
+            LogItems = AttributedText.string.split(separator: "\n")
         }
-        LogItems = AttributedText.string.split(separator: "\n")
     }
 }
 
@@ -144,14 +144,6 @@ class LogStream {
                 }
             }
         }
-        outputSource.resume()
-        errorSource.resume()
-    }
-    func pause(){
-        outputSource.suspend()
-        errorSource.suspend()
-    }
-    func resume(){
         outputSource.resume()
         errorSource.resume()
     }
