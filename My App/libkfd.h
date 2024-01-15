@@ -21,7 +21,7 @@
 enum puaf_method {
     puaf_physpuppet,
     puaf_smith,
-    puaf_landa,
+    //puaf_landa,
 };
 
 enum kread_method {
