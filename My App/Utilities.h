@@ -11,4 +11,4 @@ void kwrite64(uint64_t where, uint64_t what);
 uint64_t getProc(pid_t pid);
 void kfd_print(char* format, ...);
 void testPrint(void);
-void enableLog(BOOL);
+void enableLog(BOOL enable);
