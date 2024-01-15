@@ -27,6 +27,10 @@ uint64_t off_u_cr_groups = 0x28;
 uint64_t off_u_cr_rgid = 0x68;
 uint64_t off_u_cr_svgid = 0x6c;
 
+NSString* GetLogString(void) {
+    return LogString;
+}
+
 void kfd_print(char* format, ...) {
     va_list args;
     va_start(args, format);
