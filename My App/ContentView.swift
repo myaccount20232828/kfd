@@ -13,12 +13,10 @@ struct ContentView: View {
                             .font(.custom("Menlo", size: 15))
                         }
                     }
-                    .onReceive(NotificationCenter.default.publisher(for: Notification.Name("com.AppInstalleriOS.LogStream"))) { obj in
+                    .onReceive(NotificationCenter.default.publisher(for: Notification.Name("com.AppInstalleriOS.LogStream"))) { notification in
                         DispatchQueue.global(qos: .utility).async {
-                            if let a = obj.userInfo {
-                                UIPasteboard.general.string = a.description
-                            } else {
-                                UIPasteboard.general.string = obj.description
+                            if let notification = notification as? NSNotification, let LogString = notification.object as? String {
+                                UIPasteboard.general.string = LogString
                             }
                             LogItems = GetLogString().split(separator: "\n")
                             scroll.scrollTo(LogItems.count - 1)
