@@ -55,10 +55,10 @@ struct ContentView: View {
                     HStack {
                         Button("kopen") {
                             puaf_pages = puaf_pages_options[puaf_pages_index]
-                            kfd = kopen_intermediate(UInt64(puaf_pages), UInt64(puaf_method), UInt64(kread_method), UInt64(kwrite_method))
+                            kfd = kopen(UInt64(puaf_pages), UInt64(puaf_method), UInt64(kread_method), UInt64(kwrite_method))
                         }.disabled(kfd != 0).frame(minWidth: 0, maxWidth: .infinity)
                         Button("kclose") {
-                            kclose_intermediate(kfd)
+                            kclose(kfd)
                             puaf_pages = 0
                             kfd = 0
                         }.disabled(kfd == 0).frame(minWidth: 0, maxWidth: .infinity)
