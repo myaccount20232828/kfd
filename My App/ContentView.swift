@@ -32,14 +32,12 @@ struct ContentView: View {
                 if kfd == 0 {
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
                 } else {
-                    enableLog(true)
-                    postExploit()
                     kclose(kfd)
                     kfd = 0
                     enableLog(false)
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 13" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 14" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -51,6 +49,13 @@ struct ContentView: View {
             } label: {
                 Text("Test")
             }
+            Button {
+                enableLog(true)
+                postExploit()
+            } label: {
+                Text("Post Exploit")
+            }
+            .disabled(kfd == 0)
         }
     }
 }
