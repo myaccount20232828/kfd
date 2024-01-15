@@ -54,7 +54,7 @@ void postExploit(void) {
 }
 
 uint64_t getProc(pid_t pid) {
-    uint64_t proc = get_kernproc();
+    uint64_t proc = ((struct kfd*)_kfd)->info.kaddr.kernel_proc;
     while (true) {
         if(kread32(proc + off_p_pid) == pid) {
             return proc;
