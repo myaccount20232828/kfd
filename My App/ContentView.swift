@@ -2,14 +2,14 @@ import SwiftUI
 
 struct ContentView: View {
     @State var kfd: UInt64 = 0
-    @State var LogItems: [String] = ["Ready!"]
+    @State var LogItems: [String.SubSequence] = ["Ready!"]
     var body: some View {
         VStack {
             ScrollView {
                 ScrollViewReader { scroll in
                     VStack(alignment: .leading) {
                         ForEach(0..<LogItems.count, id: \.self) { LogItem in
-                            Text("[*] \(LogItems[LogItem])")
+                            Text("[*] \(String(LogItems[LogItem]))")
                             .font(.custom("Menlo", size: 15))
                         }
                     }
@@ -34,7 +34,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 21" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 22" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -62,12 +62,13 @@ struct ContentView: View {
 //From https://github.com/Odyssey-Team/Taurine/blob/main/Taurine/app/LogStream.swift
 //Code from Taurine https://github.com/Odyssey-Team/Taurine under BSD 4 License
 class LogStream {
+    private(set) var outputString = ""
     private(set) var outputFd: [Int32] = [0, 0]
     private(set) var errFd: [Int32] = [0, 0]
     private let readQueue: DispatchQueue
     private let outputSource: DispatchSourceRead
     private let errorSource: DispatchSourceRead
-    init(_ LogItems: Binding<[String]>) {
+    init(_ LogItems: Binding<[String.SubSequence]>) {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
         guard pipe(&outputFd) != -1,
             pipe(&errFd) != -1 else {
@@ -105,7 +106,10 @@ class LogStream {
             write(origOutput, buffer, bytesRead)
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
-                LogItems.wrappedValue.append(String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self)))
+                let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
+                let textColor = UIColor.white
+                self.outputString.append(str)
+                LogItems.wrappedValue = self.outputString.split(separator: "\n")
             }
         }
         errorSource.setEventHandler {
@@ -122,7 +126,11 @@ class LogStream {
             write(origErr, buffer, bytesRead)
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
-                LogItems.wrappedValue.append(String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self)))
+                let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
+                let textColor = UIColor(red: 219/255.0, green: 44.0/255.0, blue: 56.0/255.0, alpha: 1)
+                let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
+                self.outputString.append(str)
+                LogItems.wrappedValue = self.outputString.split(separator: "\n")
             }
         }
         outputSource.resume()
