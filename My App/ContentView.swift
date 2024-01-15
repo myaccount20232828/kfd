@@ -30,14 +30,21 @@ struct ContentView: View {
             .cornerRadius(20)
             Button {
                 if kfd == 0 {
+                    enableLog(false)
+                    testSleep()
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
+                    testSleep()
+                    enableLog(true)
                 } else {
+                    enableLog(false)
+                    testSleep()
                     kclose(kfd)
                     kfd = 0
-                    enableLog(false)
+                    testSleep()
+                    enableLog(true)
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 14" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 15" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -50,12 +57,14 @@ struct ContentView: View {
                 Text("Test")
             }
             Button {
-                enableLog(true)
                 postExploit()
             } label: {
                 Text("Post Exploit")
             }
             .disabled(kfd == 0)
         }
+    }
+    func testSleep() {
+        sleep(1)
     }
 }
