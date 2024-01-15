@@ -70,19 +70,13 @@ class LogStream {
     private let errorSource: DispatchSourceRead
     init(_ LogItems: Binding<[String.SubSequence]>) {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
-        guard pipe(&outputFd) != -1,
-            pipe(&errFd) != -1 else {
-                print("pipe failed")
-                return
-        }
+        pipe(&outputFd)
+        pipe(&errFd)
         let origOutput = dup(STDOUT_FILENO)
         let origErr = dup(STDERR_FILENO)
         setvbuf(stdout, nil, _IONBF, 0)
-        guard dup2(outputFd[1], STDOUT_FILENO) >= 0,
-            dup2(errFd[1], STDERR_FILENO) >= 0 else {
-                print("dup2 failed")
-                return
-        }
+        dup2(outputFd[1], STDOUT_FILENO)
+        dup2(errFd[1], STDERR_FILENO
         outputSource = DispatchSource.makeReadSource(fileDescriptor: outputFd[0], queue: readQueue)
         errorSource = DispatchSource.makeReadSource(fileDescriptor: errFd[0], queue: readQueue)
         outputSource.setCancelHandler {
