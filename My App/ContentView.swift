@@ -34,7 +34,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 20" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 21" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -67,7 +67,7 @@ class LogStream {
     private let readQueue: DispatchQueue
     private let outputSource: DispatchSourceRead
     private let errorSource: DispatchSourceRead
-    init(_ LogItems: Binding<[Strinh]>) {
+    init(_ LogItems: Binding<[String]>) {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
         guard pipe(&outputFd) != -1,
             pipe(&errFd) != -1 else {
