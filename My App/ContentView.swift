@@ -43,7 +43,7 @@ struct ContentView: View {
                     LogStream.shared.enableLog(true)
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 17" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 18" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -86,7 +86,7 @@ class LogStream {
     private let readQueue: DispatchQueue
     private let outputSource: DispatchSourceRead
     private let errorSource: DispatchSourceRead
-    private(set) var logEnabled = true
+    private(set) var logEnabled = false
     init() {
         readQueue = DispatchQueue(label: "org.coolstar.sileo.logstream", qos: .userInteractive, attributes: .concurrent, autoreleaseFrequency: .inherit, target: nil)
         guard pipe(&outputFd) != -1,
@@ -165,6 +165,6 @@ class LogStream {
         errorSource.resume()
     }
     func enableLog(_ enable: Bool) {
-        self.logEnabled = enable
+        logEnabled = enable
     }
 }
