@@ -27,12 +27,10 @@ uint64_t off_u_cr_groups = 0x28;
 uint64_t off_u_cr_rgid = 0x68;
 uint64_t off_u_cr_svgid = 0x6c;
 
+NSString* LogString = @"";
+
 void testPrint(void) {
     kfd_print("test print\n");
-}
-
-NSString* GetLogString(void) {
-    return LogString;
 }
 
 void kfd_print(char* format, ...) {
