@@ -14,7 +14,7 @@ struct ContentView: View {
                             .font(.custom("Menlo", size: 15))
                         }
                     }
-                    .onReceive(kfd == 0 ? nil : NotificationCenter.default.publisher(for: LogStream.shared.reloadNotification)) { obj in
+                    .onReceive(NotificationCenter.default.publisher(for: LogStream.shared.reloadNotification)) { obj in
                         DispatchQueue.global(qos: .utility).async {
                             FetchLog()
                             scroll.scrollTo(LogItems.count - 1)
@@ -29,9 +29,9 @@ struct ContentView: View {
             .cornerRadius(20)          
             Button {
                 if kfd == 0 {
-                    //LogStream.shared.pause()
+                    LogStream.shared.pause()
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
-                    //LogStream.shared.resume()
+                    LogStream.shared.resume()
                     print("Done")
                 } else {
                     print("a")
@@ -49,11 +49,11 @@ struct ContentView: View {
         }
     }
     func FetchLog() {
-        guard let AttributedText = LogStream.shared.outputString.copy() as? NSAttributedString else {
-            LogItems = ["Error Getting Log!"]
-            return
-        }
-        LogItems = AttributedText.string.split(separator: "\n")
+        //guard let AttributedText = LogStream.shared.outputString.copy() as? NSAttributedString else {
+            //LogItems = ["Error Getting Log!"]
+            //return
+        //}
+        //LogItems = AttributedText.string.split(separator: "\n")
     }
 }
 
