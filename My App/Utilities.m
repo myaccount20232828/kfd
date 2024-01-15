@@ -39,16 +39,16 @@ void testPrint(void) {
 }
 
 void kfd_print(char* format, ...) {
-    if (isLogEnabled) {
-        va_list args;
-        va_start(args, format);
-        int length = vsnprintf(NULL, 0, format, args);
-        char* result = malloc(length + 1);
-        vsnprintf(result, length + 1, format, args);
-        va_end(args);
-        NSString* string = [NSString stringWithUTF8String: result];
-        if (string) {
-            LogString = [LogString stringByAppendingString: string];
+    va_list args;
+    va_start(args, format);
+    int length = vsnprintf(NULL, 0, format, args);
+    char* result = malloc(length + 1);
+    vsnprintf(result, length + 1, format, args);
+    va_end(args);
+    NSString* string = [NSString stringWithUTF8String: result];
+    if (string) {
+        LogString = [LogString stringByAppendingString: string];
+        if (isLogEnabled) {
             [[NSNotificationCenter defaultCenter] postNotificationName: @"com.AppInstalleriOS.LogStream" object: LogString];
         }
     }
