@@ -34,7 +34,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 22" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log v2 1" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -76,7 +76,7 @@ class LogStream {
         let origErr = dup(STDERR_FILENO)
         setvbuf(stdout, nil, _IONBF, 0)
         dup2(outputFd[1], STDOUT_FILENO)
-        dup2(errFd[1], STDERR_FILENO
+        dup2(errFd[1], STDERR_FILENO)
         outputSource = DispatchSource.makeReadSource(fileDescriptor: outputFd[0], queue: readQueue)
         errorSource = DispatchSource.makeReadSource(fileDescriptor: errFd[0], queue: readQueue)
         outputSource.setCancelHandler {
