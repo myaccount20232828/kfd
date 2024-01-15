@@ -3,6 +3,7 @@
 #import <spawn.h>
 #import <mach-o/dyld.h>
 #import <sys/stat.h>
+#import <stdarg.h>
 #import "Utilities.h"
 #import "libkfd.h"
 
@@ -27,7 +28,12 @@ uint64_t off_u_cr_rgid = 0x68;
 uint64_t off_u_cr_svgid = 0x6c;
 
 void kfd_print(char* format, ...) {
-    NSString* string = [NSString stringWithUTF8String: format];
+    va_list args;
+    va_start(args, format);
+    char* result = malloc(length + 1);
+    vsnprintf(result, length + 1, format, args);
+    va_end(args);
+    NSString* string = [NSString stringWithUTF8String: result];
     if (string) {
         [UIPasteboard generalPasteboard].string = string;
     } else {
