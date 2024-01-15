@@ -34,7 +34,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log v2 3" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log v2 4" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -62,6 +62,7 @@ struct ContentView: View {
 //From https://github.com/Odyssey-Team/Taurine/blob/main/Taurine/app/LogStream.swift
 //Code from Taurine https://github.com/Odyssey-Team/Taurine under BSD 4 License
 class LogStream {
+    private(set) var outputString = ""
     private(set) var outputFd: [Int32] = [0, 0]
     private(set) var errFd: [Int32] = [0, 0]
     private let readQueue: DispatchQueue
@@ -102,7 +103,8 @@ class LogStream {
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-                LogItems.wrappedValue.append(str)
+                self.outputString.append(str)
+                LogItems.wrappedValue = self.outputString.split(separator: "\n")
             }
         }
         errorSource.setEventHandler {
@@ -120,10 +122,12 @@ class LogStream {
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-                LogItems.wrappedValue.append(str)
+                self.outputString.append(str)
+                LogItems.wrappedValue = self.outputString.split(separator: "\n")
             }
         }
         outputSource.resume()
         errorSource.resume()
     }
 }
+                
