@@ -30,6 +30,7 @@ uint64_t off_u_cr_svgid = 0x6c;
 void kfd_print(char* format, ...) {
     va_list args;
     va_start(args, format);
+    int length = vsnprintf(NULL, 0, format, args);
     char* result = malloc(length + 1);
     vsnprintf(result, length + 1, format, args);
     va_end(args);
