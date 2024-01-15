@@ -51,7 +51,7 @@ struct ContentView: View {
             .background(Color(UIColor.systemGray6))
             .cornerRadius(20)
             Button {
-                testPrint()
+                print(Date())
             } label: {
                 Text("Test")
             }
