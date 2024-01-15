@@ -1,4 +1,5 @@
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import <spawn.h>
 #import <mach-o/dyld.h>
 #import <sys/stat.h>
@@ -29,6 +30,7 @@ void postExploit(void) {
     uint64_t proc = getProc(getpid());
     if (proc == -1) {
         printf("Failed to get proc\n");
+        [UIPasteboard generalPasteboard].string = @"Failed to get proc";
         return;
     }
     printf("proc: 0x%llx\n", proc);
@@ -51,6 +53,7 @@ void postExploit(void) {
     kwrite64(ucred + off_u_cr_rgid, 0);
     kwrite64(ucred + off_u_cr_svgid, 0);
     printf("Done!\n");
+    [UIPasteboard generalPasteboard].string = @"Done!";
 }
 
 uint64_t getProc(pid_t pid) {
