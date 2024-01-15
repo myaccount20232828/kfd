@@ -3,11 +3,12 @@ import SwiftUI
 struct ContentView: View {
     @State var kfd: UInt64 = 0
     @State var LogItems: [String.SubSequence] = ["Ready!"]
+    @State var ShowLog = false
     var body: some View {
         VStack {
             ScrollView {
                 ScrollViewReader { scroll in
-                    if kfd != 0 {
+                    if ShowLog {
                         VStack(alignment: .leading) {
                             ForEach(0..<LogItems.count, id: \.self) { LogItem in
                                 Text("[*] \(String(LogItems[LogItem]))")
@@ -31,16 +32,16 @@ struct ContentView: View {
             .cornerRadius(20)          
             Button {
                 if kfd == 0 {
-                    //LogStream.shared.pause()
+                    ShowLog = false
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
-                    //LogStream.shared.resume()
+                    ShowLog = true
                 } else {
                     print("a")
                     kclose(kfd)
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit 8: Log Stuff" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit 9: Log Stuff" : "Post Exploit")
                 .font(.system(size: 20))
             }
             //.disabled(!IsSupported())
