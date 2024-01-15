@@ -13,12 +13,10 @@ struct ContentView: View {
                             .font(.custom("Menlo", size: 15))
                         }
                     }
-                    .onReceive(NotificationCenter.default.publisher(for: Notification.Name("com.AppInstalleriOS.LogStream"))) { Notification in
+                    .onReceive(NotificationCenter.default.publisher(for: LogStream.shared.reloadNotification)) { obj in
                         DispatchQueue.global(qos: .utility).async {
-                            if let Notification = Notification as? NSNotification, let LogString = Notification.object as? String {
-                                LogItems = LogString.split(separator: "\n")
-                                scroll.scrollTo(LogItems.count - 1)
-                            }
+                            FetchLog()
+                            scroll.scrollTo(LogItems.count - 1)
                         }
                     }
                 }
@@ -45,7 +43,7 @@ struct ContentView: View {
                     LogStream.shared.enableLog(true)
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 16" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 17" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
@@ -67,6 +65,13 @@ struct ContentView: View {
     }
     func testSleep() {
         Thread.sleep(forTimeInterval: 1)
+    }
+    func FetchLog() {
+        guard let AttributedText = LogStream.shared.outputString.copy() as? NSAttributedString else {
+            LogItems = ["Error Getting Log!"]
+            return
+        }
+        LogItems = AttributedText.string.split(separator: "\n")
     }
 }
 
