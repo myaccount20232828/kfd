@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @State var kfd: UInt64 = 0
     var body: some View {
+        Text(LogString)
         Button {
             if kfd == 0 {
                 kfd = kopen(0x800, 0x0, 0x2, 0x2)
@@ -10,9 +11,10 @@ struct ContentView: View {
                 postExploit()
                 kclose(kfd)
                 kfd = 0
+                UIPasteboard.general.string = LogString
             }
         } label: {
-            Text(kfd == 0 ? "Exploit 12" : "Post Exploit")
+            Text(kfd == 0 ? "Exploit 13" : "Post Exploit")
             .font(.system(size: 20))
         }
         .buttonStyle(.plain)
