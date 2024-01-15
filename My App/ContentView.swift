@@ -64,7 +64,6 @@ struct ContentView: View {
 //Code from Taurine https://github.com/Odyssey-Team/Taurine under BSD 4 License
 class LogStream {
     var LogItems: [String] = ["Ready!"]
-    private(set) var outputString = ""
     private(set) var outputFd: [Int32] = [0, 0]
     private(set) var errFd: [Int32] = [0, 0]
     private let readQueue: DispatchQueue
@@ -105,8 +104,7 @@ class LogStream {
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-                self.outputString.append(str)
-                self.LogItems = self.outputString.split(separator: "\n")
+                self.LogItems.append(str)
             }
         }
         errorSource.setEventHandler {
@@ -124,8 +122,7 @@ class LogStream {
             let array = Array(UnsafeBufferPointer(start: buffer, count: bytesRead)) + [UInt8(0)]
             array.withUnsafeBufferPointer { ptr in
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
-                self.outputString.append(str)
-                self.LogItems = self.outputString.split(separator: "\n")
+                self.LogItems.append(str)
             }
         }
         outputSource.resume()
