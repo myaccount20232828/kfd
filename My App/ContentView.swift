@@ -73,6 +73,7 @@ class LogStream {
         guard pipe(&outputFd) != -1,
             pipe(&errFd) != -1 else {
                 print("pipe failed")
+                return
         }
         let origOutput = dup(STDOUT_FILENO)
         let origErr = dup(STDERR_FILENO)
@@ -80,6 +81,7 @@ class LogStream {
         guard dup2(outputFd[1], STDOUT_FILENO) >= 0,
             dup2(errFd[1], STDERR_FILENO) >= 0 else {
                 print("dup2 failed")
+                return
         }
         outputSource = DispatchSource.makeReadSource(fileDescriptor: outputFd[0], queue: readQueue)
         errorSource = DispatchSource.makeReadSource(fileDescriptor: errFd[0], queue: readQueue)
