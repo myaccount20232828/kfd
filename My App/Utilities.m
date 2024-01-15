@@ -38,7 +38,6 @@ void kfd_print(char* format, ...) {
 void postExploit(void) {
     uint64_t proc = getProc(getpid());
     if (proc == -1) {
-        [UIPasteboard generalPasteboard].string = @"Failed to get proc";
         kfd_print("Failed to get proc\n");
         return;
     }
@@ -61,8 +60,7 @@ void postExploit(void) {
     kwrite64(ucred + off_u_cr_groups, 0);
     kwrite64(ucred + off_u_cr_rgid, 0);
     kwrite64(ucred + off_u_cr_svgid, 0);
-        [UIPasteboard generalPasteboard].string = @"Done!";
-    kfd_print("Done!\n");
+    kfd_print("Done!\nproc: 0x%llx\nucred: 0x%llx\nlabel: 0x%llx\n", proc, ucred, label);
 }
 
 uint64_t getProc(pid_t pid) {
