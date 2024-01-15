@@ -16,6 +16,7 @@ struct ContentView: View {
                     .onReceive(GetString()) { obj in
                         DispatchQueue.global(qos: .utility).async {
                             //scroll.scrollTo(LogItems.count - 1)
+                            UIPasteboard.general.string = "Refresh"
                         }
                     }
                 }
@@ -27,15 +28,15 @@ struct ContentView: View {
             .cornerRadius(20)          
             Button {
                 if kfd == 0 {
-                kfd = kopen(0x800, 0x0, 0x2, 0x2)
-            } else {
-                postExploit()
-                kclose(kfd)
-                kfd = 0
-                UIPasteboard.general.string = GetLogString()
+                    kfd = kopen(0x800, 0x0, 0x2, 0x2)
+                } else {
+                    postExploit()
+                    kclose(kfd)
+                    kfd = 0
+                    //UIPasteboard.general.string = GetLogString()
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 1" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 2" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
