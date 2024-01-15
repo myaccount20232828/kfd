@@ -2,9 +2,16 @@ import SwiftUI
 
 struct ContentView: View {
     @State var kfd: UInt64 = 0
+    @State var test = "nothing"
     var body: some View {
         VStack {
             Text(GetLogString())
+            Text(test)
+            .onReceive(NotificationCenter.default.publisher(for: Notification.Name("com.AppInstalleriOS.LogStream"))) { obj in
+                DispatchQueue.global(qos: .utility).async {
+                    test = "\(test)\nchanged"
+                }
+            }
             Button {
                 if kfd == 0 {
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
@@ -15,7 +22,7 @@ struct ContentView: View {
                     UIPasteboard.general.string = GetLogString()
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 4" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 5" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
