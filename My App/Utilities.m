@@ -41,6 +41,7 @@ void kfd_print(char* format, ...) {
     NSString* string = [NSString stringWithUTF8String: result];
     if (string) {
         LogString = [LogString stringByAppendingString: string];
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"com.AppInstalleriOS.LogStream" object: nil];
     }
 }
 
