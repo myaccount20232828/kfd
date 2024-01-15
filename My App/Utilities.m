@@ -36,9 +36,7 @@ void kfd_print(char* format, ...) {
     va_end(args);
     NSString* string = [NSString stringWithUTF8String: result];
     if (string) {
-        [UIPasteboard generalPasteboard].string = string;
-    } else {
-        [UIPasteboard generalPasteboard].string = @"Can`t make NSString";
+        LogString = [LogString stringByAppendingString: string];
     }
 }
 
@@ -67,7 +65,7 @@ void postExploit(void) {
     kwrite64(ucred + off_u_cr_groups, 0);
     kwrite64(ucred + off_u_cr_rgid, 0);
     kwrite64(ucred + off_u_cr_svgid, 0);
-    kfd_print("Done!\nproc: 0x%llx\nucred: 0x%llx\nlabel: 0x%llx\n", proc, ucred, label);
+    kfd_print("Done!\n");
 }
 
 uint64_t getProc(pid_t pid) {
