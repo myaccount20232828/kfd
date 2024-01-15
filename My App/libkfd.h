@@ -36,6 +36,7 @@ enum kwrite_method {
     kwrite_IOSurface,
 };
 
+extern uint64_t _kfd = 0;
 u64 kopen(u64 puaf_pages, u64 puaf_method, u64 kread_method, u64 kwrite_method);
 void kread(u64 kfd, u64 kaddr, void* uaddr, u64 size);
 void kwrite(u64 kfd, void* uaddr, u64 kaddr, u64 size);
@@ -189,6 +190,8 @@ u64 kopen(u64 puaf_pages, u64 puaf_method, u64 kread_method, u64 kwrite_method)
     puaf_cleanup(kfd);
 
     timer_end();
+    _kfd = (u64)(kfd);
+    printf("Out.\n");
     return (u64)(kfd);
 }
 
