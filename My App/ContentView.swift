@@ -111,7 +111,7 @@ class LogStream {
                 let str = String(cString: unsafeBitCast(ptr.baseAddress, to: UnsafePointer<CChar>.self))
                 let textColor = UIColor.white
                 self.outputString.append(str)
-                LogItems.wrappedValue = outputString.split(separator: "\n")
+                LogItems.wrappedValue = self.outputString.split(separator: "\n")
             }
         }
         errorSource.setEventHandler {
@@ -132,7 +132,7 @@ class LogStream {
                 let textColor = UIColor(red: 219/255.0, green: 44.0/255.0, blue: 56.0/255.0, alpha: 1)
                 let substring = NSMutableAttributedString(string: str, attributes: [NSAttributedString.Key.foregroundColor: textColor])
                 self.outputString.append(str)
-                LogItems.wrappedValue = outputString.split(separator: "\n")
+                LogItems.wrappedValue = self.outputString.split(separator: "\n")
             }
         }
         outputSource.resume()
