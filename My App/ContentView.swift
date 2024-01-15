@@ -3,7 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @State var kfd: UInt64 = 0
     @State var LogItems: [String.SubSequence] = ["Ready!"]
-    @State var ShowLog = true
+    @State var ShowLog = false
     var body: some View {
         VStack {
             ScrollView {
@@ -32,19 +32,18 @@ struct ContentView: View {
             .cornerRadius(20)          
             Button {
                 if kfd == 0 {
-                    ShowLog = false
                     kfd = kopen(0x800, 0x0, 0x2, 0x2)
                     ShowLog = true
                 } else {
-                    print("a")
+                    print("KFD Success")
+                    ShowLog = false
                     kclose(kfd)
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit 10: Log Stuff" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit 11" : "Post Exploit")
                 .font(.system(size: 20))
             }
-            //.disabled(!IsSupported())
             .buttonStyle(.plain)
             .frame(width: UIScreen.main.bounds.width - 80, height: 70)
             .background(Color(UIColor.systemGray6))
