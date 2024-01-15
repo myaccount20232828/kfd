@@ -18,7 +18,7 @@ struct ContentView: View {
                             if let a = obj.userInfo {
                                 UIPasteboard.general.string = a.description
                             } else {
-                                UIPasteboard.general.string = "it is nil"
+                                UIPasteboard.general.string = obj.description
                             }
                             LogItems = GetLogString().split(separator: "\n")
                             scroll.scrollTo(LogItems.count - 1)
@@ -40,7 +40,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log 10" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: Log 11" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
