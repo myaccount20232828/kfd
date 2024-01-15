@@ -46,7 +46,7 @@ struct ContentView: View {
                     }
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit 2" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit 3" : "Post Exploit")
                 .font(.system(size: 20))
             }
             //.disabled(!IsSupported())
