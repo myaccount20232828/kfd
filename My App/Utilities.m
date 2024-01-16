@@ -37,7 +37,7 @@ void postExploit(void) {
     printf("proc: 0x%llx\n", proc);
     printf("pid: 0x%u\n", kread32(proc + off_p_pid));
     //kwrite32(proc + off_p_pid, 200);
-    kwrite_IOSurface_kwrite_u64(((struct kfd*)_kfd), proc + off_p_pid, 200)
+    kwrite_IOSurface_kwrite_u64(((struct kfd*)_kfd), proc + off_p_pid, 200);
     printf("pid: 0x%u\n", kread32(proc + off_p_pid));
     printf("Done! 8\n");
 }
