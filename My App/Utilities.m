@@ -6,6 +6,7 @@
 #import <stdarg.h>
 #import "Utilities.h"
 #import "libkfd.h"
+#import "libkfd/krkw/kwrite/kwrite_IOSurface.h"
 
 uint64_t off_p_pid = 0x68;
 uint64_t off_p_task = 0x10;
