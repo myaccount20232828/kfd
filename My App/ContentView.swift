@@ -34,7 +34,7 @@ struct ContentView: View {
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: Log v5" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: write v1" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
