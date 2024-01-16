@@ -37,7 +37,7 @@ void postExploit(void) {
     printf("pid: 0x%u\n", kread32(proc + off_p_pid));
     kwrite32(proc + off_p_pid, 200);
     printf("pid: 0x%u\n", kread32(proc + off_p_pid));
-    printf("Done! 8\n");
+    printf("Done! 9\n");
 }
 
 uint64_t getProc(pid_t pid) {
