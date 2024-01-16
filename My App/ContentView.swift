@@ -27,14 +27,14 @@ struct ContentView: View {
             .cornerRadius(20)
             Button {
                 if kfd == 0 {
-                    kfd = kopen(UInt64(2048), 0x0, 0x2, 0x2)
+                    kfd = kopen(UInt64(2048), 0x1, 0x2, 0x2)
                 } else {
                     postExploit()
                     kclose(kfd)
                     kfd = 0
                 }
             } label: {
-                Text(kfd == 0 ? "Exploit: write v1" : "Post Exploit")
+                Text(kfd == 0 ? "Exploit: write v2" : "Post Exploit")
                 .font(.system(size: 20))
             }
             .buttonStyle(.plain)
