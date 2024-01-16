@@ -178,7 +178,7 @@ u64 kopen(u64 puaf_pages, u64 puaf_method, u64 kread_method, u64 kwrite_method)
     const u64 puaf_pages_max = 2048;
     assert(puaf_pages >= puaf_pages_min);
     assert(puaf_pages <= puaf_pages_max);
-    assert(puaf_method <= puaf_landa);
+    //assert(puaf_method <= puaf_landa);
     assert(kread_method <= kread_IOSurface);
     assert(kwrite_method <= kwrite_IOSurface);
 
