@@ -21,8 +21,9 @@ struct ContentView: View {
     @State private var kwrite_method = 1
 
     var body: some View {
-        NavigationView {
-            Form {
+        VStack {
+        Form {
+            NavigationView {
                 Section {
                     Picker(selection: $puaf_pages_index, label: Text("puaf pages:")) {
                         ForEach(0 ..< puaf_pages_options.count, id: \.self) {
@@ -51,34 +52,81 @@ struct ContentView: View {
                         }
                     }.disabled(kfd != 0)
                 }
-                Section {
-                    HStack {
-                        Button("kopen") {
-                            puaf_pages = puaf_pages_options[puaf_pages_index]
-                            kfd = kopen_intermediate(UInt64(puaf_pages), UInt64(puaf_method), UInt64(kread_method), UInt64(kwrite_method))
-                        }.disabled(kfd != 0).frame(minWidth: 0, maxWidth: .infinity)
-                        Button("kclose") {
-                            kclose_intermediate(kfd)
-                            puaf_pages = 0
-                            kfd = 0
-                        }.disabled(kfd == 0).frame(minWidth: 0, maxWidth: .infinity)
-                    }
-                }.listRowBackground(Color.clear)
-                if kfd != 0 {
-                    Section {
-                        VStack {
-                            Text("Success!").foregroundColor(.green)
-                            Text("Look at output in Xcode")
-                        }.frame(minWidth: 0, maxWidth: .infinity)
-                    }.listRowBackground(Color.clear)
+            }
+        }
+            LogView()
+            Button("kopen") {
+                DispatchQueue.global(qos: .utility).async {
+                    puaf_pages = puaf_pages_options[puaf_pages_index]
+                    kfd = kopen_intermediate(UInt64(puaf_pages), UInt64(puaf_method), UInt64(kread_method), UInt64(kwrite_method))
                 }
-            }.navigationBarTitle(Text("kfd"), displayMode: .inline)
+            }
         }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+struct LogView: View {
+    @State var LogItems: [LogItem] = []
+    let pipe = Pipe()
+    let sema = DispatchSemaphore(value: 0)
+    var body: some View {
+        ScrollView {
+            ScrollViewReader { scroll in
+                VStack(alignment: .leading) {
+                    ForEach(LogItems) { Item in
+                        Text(Item.Message.lineFix())
+                        .font(.system(size: 15, weight: .regular, design: .monospaced))
+                        .foregroundColor(.white)
+                        .id(Item.id)
+                    }
+                }
+                .onChange(of: LogItems) { _ in
+                    DispatchQueue.main.async {
+                        scroll.scrollTo(LogItems.last?.id, anchor: .bottom)
+                    }
+                }
+                .contextMenu {
+                    Button {
+                        var LogString = ""
+                        for Item in LogItems {
+                            LogString += Item.Message
+                        }
+                        UIPasteboard.general.string = LogString
+                    } label: {
+                        Label("Copy to clipboard", systemImage: "doc.on.doc")
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding()
+        .frame(width: UIScreen.main.bounds.width - 80, height: 300)
+        .background(Color(UIColor.systemGray6))
+        .cornerRadius(20)
+        .onAppear {
+            pipe.fileHandleForReading.readabilityHandler = { fileHandle in
+                let data = fileHandle.availableData
+                if data.isEmpty  {
+                    fileHandle.readabilityHandler = nil
+                    sema.signal()
+                } else {
+                    LogItems.append(LogItem(Message: String(data: data, encoding: .utf8)!))
+                }
+            }
+            setvbuf(stdout, nil, _IONBF, 0)
+            dup2(pipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO)
+        }
+    }
+}
+
+struct LogItem: Identifiable, Equatable {
+    var id = UUID()
+    var Message: String
+}
+
+extension String {
+    // If last char is a new line remove it
+    func lineFix() -> String {
+        return String(self.last == "\n" ? String(self.dropLast()) : self)
     }
 }
